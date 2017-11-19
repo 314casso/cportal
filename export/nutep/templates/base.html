@@ -38,7 +38,10 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title" style="border: 0;">
-              <a href="{% url 'services' %}" class="site_title"><i class="fa fa-ship"></i> <span>{{ title }}</span></a>
+              <a href="{% url 'services' %}" class="site_title"><i class="fa fa-tachometer"></i> <span>              
+              Личный кабинет                            
+              </span>              
+              </a>                            
             </div>
 
             <div class="clearfix"></div>
@@ -52,44 +55,39 @@
               	{% if request.user.is_authenticated %} <span>Здравствуйте,</span> 
 			  	{% else %}<a href="{% url 'login' %}">Войти</a>{% endif %}
                 <h2>{{ request.user.profile.fullname }}</h2>
+                <h5>RUSCON</h5>
               </div>
             </div>
             <!-- /menu profile quick info -->
 
-            <br />
-
+            
             <!-- sidebar menu -->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <h3>Основное меню</h3>
+              <div class="menu_section">                
                 <ul class="nav side-menu">
                   <li><a><i class="fa fa-home"></i> Сервисы <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="{% url 'services' %}"> Панель управления</a></li>                      
+                      
+                      <li><a href="#"> Сделки</a></li>
+                      
+                      <li><a href="#"> Маркетинг</a></li>
+                                           
+                      
                     </ul>
                   </li>                  
-                  
-                  <li><a><i class="fa fa-ship"></i> Рейсы <span class="fa fa-chevron-down"></span></a>
-
-                    <ul class="nav child_menu">
-                      {% regroup orders by voyage.vessel as vessel_list %}
-                    	{% for vessel in vessel_list  %}
-                        <li><a> {{ vessel.grouper }}<span class="fa fa-chevron-down"></span></a>
-                          <ul class="nav child_menu">
-                          	{% for order in vessel.list  %}
-                              <li class="sub_menu"><a href="{% url 'drafts' order.pk %}"> {{ order.voyage }} ({{ order.contract.line }})</a></li>
-                            {% endfor %}                            
-                          </ul>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                  </li>
-                  
+                       
                   <li><a><i class="fa fa-info-circle"></i>Информация <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
+                      <li><a href="#">Прочее</a></li>                                            
+                    </ul>
+                  </li>     
+                                   
+                  
+                  <li><a><i class="fa fa-question-circle"></i>Поддержка <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
                       <li><a href="/media/templates/export.basic.help.pdf">Документация</a></li>
-                      <li><a href="mailto:it-support2@ruscon.global">Запрос в поддержку</a></li>
-                      <li><a href="/media/templates/exportbl.xlsx">Скачать шаблон</a></li>
+                      <li><a href="mailto:it-support2@ruscon.global">Запрос в поддержку</a></li>                      
                     </ul>
                   </li>
                 </ul>
@@ -123,9 +121,37 @@
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">                    
-                    <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out pull-right"></i> Выйти</a></li>
-                  </ul>
-                </li>               
+                    <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out pull-right"></i> Выйти</a></li>           
+                  </ul>                  
+                </li>  
+                <li role="presentation" class="dropdown">
+                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-envelope-o"></i>
+                    <span class="badge bg-green">1</span>
+                  </a>
+                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                    <li>
+                      <a>
+                        <span class="image"><img src="{% thumbnail request.user.profile.image 30x30 crop %}" alt="..."></span>
+                        <span>
+                          <span>{{ request.user.profile.fullname }}</span>
+                          <span class="time">3 минуты назад</span>
+                        </span>
+                        <span class="message">
+                          Обновлены документы. Входящие счета и акты сверки за втрой квартал 2017.
+                        </span>
+                      </a>
+                    </li>                    
+                    <li>
+                      <div class="text-center">
+                        <a>
+                          <strong>Посмотреть все уведомления</strong>
+                          <i class="fa fa-angle-right"></i>
+                        </a>
+                      </div>
+                    </li>
+              	  </ul>
+                </li>	                
               </ul>
             </nav>
           </div>
@@ -135,148 +161,269 @@
         <!-- page content -->
         {% block content %}
         <div class="right_col" role="main">
-        
-        	<div class="page-title">
-              <div class="title_left">
-                <h3>Панель управления <small>сервис по оформлению экспортных документов</small></h3>
-              </div>
-          </div>
 
           <div class="clearfix"></div>
-		
-          <p>
-            <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#modal-{{ template_form.key }}">
-            <i class="fa fa-upload"></i> Загрузить шаблон</button>
-          </p>
-
-          <div class="row">
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>Шаблоны  <small>статус обработки загруженных файлов</small></h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                      </li>
-                      <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                        <ul class="dropdown-menu" role="menu" id="app-settings">
-                          <li>
-                            <a v-on:click="fetchData" href="#"><i class="fa fa-refresh fa-fw"></i> Обновить</a>
-                          </li>
-                        </ul>
-                      </li>
-                      <li><a class="close-link"><i class="fa fa-close"></i></a>
-                      </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                  </div>
-                  <div class="x_content table-responsive">
-
-                  <table class="table table-hover">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Действие</th>
-                        <th>Обновлено</th>
-                        <th>Судно</th>
-                        <th>Рейс</th>
-                        <th>ETA</th>
-                        <th>Шаблон</th>
-                        <th>Статус</th>
-                      </tr>
-                    </thead>
-                    <tbody id="app-templates" v-cloak>
-                      <tr class="datarow" v-for="item in items" v-on:dblclick="open(item.url)">
-                        <th scope="row"><a :href="item.url"><% item.id %></a></th>
-
-                        <td>
-                          <div class="dropdown">
-
-                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
-                              <i class="fa fa-bars fa-fw" aria-hidden="true"></i>
-                            </a>
-
-                            <ul class="dropdown-menu dropdown-usermenu">
-                              <li>
-                                <a v-on:click="refresh(item.id)" href="#">
-                                  <i class="fa fa-spinner fa-fw"></i> Обновить
-                                </a>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-
-                        <td :title="item.user">
-                          <% item.updated %>
-                        </td>
-                        <td><% item.vessel %></td>
-                        <td><a class="btn-link" :href="item.drafts_url"><% item.voyage %></a></td>
-                        <td><% item.eta %></td>
-                        <td><% item.filename %></td>
-                        <td :id="item.status_id" :class="item.status_class">
-                          <div v-html="item.load_image"></div>
-                          <% item.status %>
-                        </td>
-                      </tr>                    
-                    </tbody>
-                  </table>
-                  </div>
-                </div>
-              </div>
-           </div>
-                            
-              <!--  -->
-          <div class="row">
-              <div class="col-md-12 col-sm-12 col-xs-12">
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>Заявки  <small>шаблоны группируются в заявки по договору и рейсу</small></h2>
-                    <ul class="nav navbar-right panel_toolbox">
-                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                      </li>
-                      <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                        <ul class="dropdown-menu" role="menu" id="app-voyage-settings">
-                          <li>
-                            <a v-on:click="fetchData" href="#"><i class="fa fa-refresh fa-fw"></i> Обновить</a>
-                          </li>
-                        </ul>
-                      </li>
-                      <li><a class="close-link"><i class="fa fa-close"></i></a>
-                      </li>
-                    </ul>
-                    <div class="clearfix"></div>
-                  </div>
-                  <div class="x_content table-responsive">        
-
-                  <table class="table table-hover">
-                    <thead>
-                      <tr>           
-                      	<th>Заявка</th>
-                      	<th>Линия</th>
-                      	<th>Договор</th>                      	             
-                        <th>Рейс</th>
-                        <th>Судно</th>                        
-                        <th>ETA</th>
-                      </tr>
-                    </thead>
-                    <tbody id="app-orders" v-cloak>
-                      <tr class="datarow" v-for="item in items" v-on:dblclick="open(item.url)">
-                      	<th scope="row"><strong><a :href="item.url"><% item.id %></a></strong></th>
-                      	<td><% item.line %></td>
-                      	<td><% item.contract %></td>
-                        <td><a :href="item.url"><% item.voyage %></a></td>                       
-                        <td><% item.vessel %></td>                        
-                        <td><% item.eta %></td>                        
-                      </tr>                    
-                    </tbody>
-                  </table>
-                  </div>
-                </div>
-              </div>
-           </div>
+          
+          <!-- top tiles -->
+          <div class="row tile_count">
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-clock-o"></i> Дата первой сделки</span>
+              <div class="count">05.11.09</div>
+              <span class="count_bottom"><i class="green">2 937 </i> дней сотрудничества</span>
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-shopping-bag"></i> Общее количество сделок</span>
+              <div class="count">523</div>
+              <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>23 </i> за последний месяц</span>
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-briefcase"></i> Импорт TEU</span>
+              <div class="count green">2500</div>
+              <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>200 </i> За последний месяц</span>
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-briefcase"></i> Экспорт TEU</span>
+              <div class="count">4567</div>
+              <span class="count_bottom"><i class="red"><i class="fa fa-sort-desc"></i>120 </i> За последний месяц</span>
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-briefcase"></i> Оказано услуг USD</span>
+              <div class="count">10 230</div>
+              <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>1002 </i> За последний месяц</span>
+            </div>            
+          </div>
+          <!-- /top tiles -->
                   
-        <!--  -->
+          
+        <div class="clearfix"></div>  
+		
+		<div class="row">
+		
+		<div class="col-md-3 col-xs-12 widget widget_tally_box">
+          <div class="x_panel fixed_height_390">
+            <div class="x_content">
+			<h4 style="text-align:center">Ваш менеджер</h4>
+              <div class="flex">
+                <ul class="list-inline widget_profile_box">
+                  <li>
+                    <a href="skype:skypeID?chat">
+                      <i class="fa fa-skype"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <img src="{% thumbnail request.user.profile.image 100x100 crop %}" alt="..." class="img-circle profile_img">
+                  </li>
+                  <li>
+                    <a href="mailto:{{ request.user.email }}">
+                      <i class="fa fa-envelope"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <h3 class="name">Павел</h3>
+              <h5 class="name">Саввин</h5>
+			  
+              <div class="flex">
+                <ul class="list-inline count2">
+                  <li style="width:90%">
+                    <h5><i class="fa fa-phone"></i> +7 900 0003-00-00</h5>
+                    
+                  </li>                  
+                </ul>
+              </div>
+              <p>
+                <p>
+		          <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#modal-{{ template_form.key }}">
+		          <i class="fa fa-check-circle"></i> Оценить</button>
+		        </p>
+              </p>
+            </div>
+          </div>
+        </div>
+		
+		<div class="col-md-3 col-xs-12 widget widget_tally_box">
+          <div class="x_panel fixed_height_390">
+            <div class="x_content">
+			<h4 style="text-align:center">Руководитель менеджера</h4>
+              <div class="flex">
+                <ul class="list-inline widget_profile_box">
+                  <li>
+                    <a href="skype:skypeID?chat">
+                      <i class="fa fa-skype"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <img src="{% thumbnail request.user.profile.image 100x100 crop %}" alt="..." class="img-circle profile_img">
+                  </li>
+                  <li>
+                    <a href="mailto:{{ request.user.email }}">
+                      <i class="fa fa-envelope"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <h3 class="name">Павел</h3>
+              <h5 class="name">Саввин</h5>
+			  
+              <div class="flex">
+                <ul class="list-inline count2">
+                  <li style="width:90%">
+                    <h5><i class="fa fa-phone"></i> +7 900 0003-00-00</h5>
+                    
+                  </li>                  
+                </ul>
+              </div>
+              <p>
+                <p>
+		          <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#modal-{{ template_form.key }}">
+		          <i class="fa fa-check-circle"></i> Оценить</button>
+		        </p>
+              </p>
+            </div>
+          </div>
+        </div>
+                
+					
+		<div class="col-md-4">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Новости группы<small>ruscon.blobal</small></h2>                    
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content" style="display: block;">
+                    <article class="media event">
+                      <a class="pull-left date">
+                        <p class="month">April</p>
+                        <p class="day">23</p>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Item One Title</a>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                      </div>
+                    </article>
+                    <article class="media event">
+                      <a class="pull-left date">
+                        <p class="month">April</p>
+                        <p class="day">23</p>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Item Two Title</a>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                      </div>
+                    </article>
+                    <article class="media event">
+                      <a class="pull-left date">
+                        <p class="month">April</p>
+                        <p class="day">23</p>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Item Two Title</a>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                      </div>
+                    </article>
+                    <article class="media event">
+                      <a class="pull-left date">
+                        <p class="month">April</p>
+                        <p class="day">23</p>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Item Two Title</a>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                      </div>
+                    </article>
+                    <article class="media event">
+                      <a class="pull-left date">
+                        <p class="month">April</p>
+                        <p class="day">23</p>
+                      </a>
+                      <div class="media-body">
+                        <a class="title" href="#">Item Three Title</a>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                      </div>
+                    </article>
+                  </div>
+                </div>
+              </div>
+			
+		</div>
+		
+		<div class="clearfix"></div>
+		
+		<div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="dashboard_graph">
+
+                <div class="row x_title">
+                
+                  <div class="col-md-6">
+                    <h3>Статистика по объемам перевозок <small>импорт/экспорт в TEU</small></h3>
+                  </div>
+                                    
+                </div>
+
+                <div class="col-md-9 col-sm-9 col-xs-9">
+                  <div id="chart_plot_01" class="demo-placeholder"></div>
+                </div>
+                
+                
+                <div class="col-md-3 col-sm-3 col-xs-12 bg-white">
+                  <div class="x_title">
+                    <h2>Дополнительные показатели</h2>
+                    <div class="clearfix"></div>
+                  </div>
+
+                  <div class="col-md-12 col-sm-12 col-xs-6">
+                    <div>
+                      <p>Показатель 1</p>
+                      <div class="">
+                        <div class="progress progress_sm" style="width: 76%;">
+                          <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="80" aria-valuenow="78" style="width: 80%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <p>Показатель 1</p>
+                      <div class="">
+                        <div class="progress progress_sm" style="width: 76%;">
+                          <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="60" aria-valuenow="59" style="width: 60%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-12 col-sm-12 col-xs-6">
+                    <div>
+                      <p>Показатель 3</p>
+                      <div class="">
+                        <div class="progress progress_sm" style="width: 76%;">
+                          <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="40" aria-valuenow="39" style="width: 40%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <p>Показатель 4</p>
+                      <div class="">
+                        <div class="progress progress_sm" style="width: 76%;">
+                          <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="50" aria-valuenow="49" style="width: 50%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                
+                
+                <div class="clearfix"></div>
+              </div>
+            </div>
+            
+           
+
+          </div>
+          
+          
+		<br>
         
         <div class="clearfix"></div>      
               
@@ -288,7 +435,7 @@
         <!-- footer content -->
         <footer>
           <div class="pull-right">
-            ©1997-{% now "Y" %} «Рускон» <a href="http://ruscon.global">эксперт контейнерных перевозок</a>
+            ©1997-{% now "Y" %} «Рускон» веб-портал по работе с клиентами 
           </div>
           <div class="clearfix"></div>
         </footer>
@@ -304,16 +451,34 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.3.3/vue.min.js"></script>
         
     <!-- FastClick -->
-    <script src="{{ STATIC_URL }}/vendors/fastclick/lib/fastclick.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js"></script>
     <!-- NProgress -->
-    <script src="{{ STATIC_URL }}/vendors/nprogress/nprogress.js"></script>
+    <script src="{{ STATIC_URL }}vendors/nprogress/nprogress.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    
     <!-- bootstrap-progressbar -->
-    <script src="{{ STATIC_URL }}/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <script src="{{ STATIC_URL }}vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
     <!-- iCheck -->
-    <script src="{{ STATIC_URL }}/vendors/iCheck/icheck.min.js"></script>
+    <script src="{{ STATIC_URL }}vendors/iCheck/icheck.min.js"></script>
+    
+    <!-- Flot -->
+    <script src="{{ STATIC_URL }}vendors/Flot/jquery.flot.js"></script>
+    <script src="{{ STATIC_URL }}vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="{{ STATIC_URL }}vendors/Flot/jquery.flot.time.js"></script>
+    <script src="{{ STATIC_URL }}vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="{{ STATIC_URL }}vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="{{ STATIC_URL }}vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="{{ STATIC_URL }}vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="{{ STATIC_URL }}vendors/flot.curvedlines/curvedLines.js"></script>
+    
+    <script src="{{ STATIC_URL }}vendors/DateJS/build/date.js"></script>
+    
     <!-- Fileinput -->
-    <script src="{{ STATIC_URL }}/vendors/bootstrap-fileinput/js/fileinput.min.js"></script>
-    <script src="{{ STATIC_URL }}/vendors/bootstrap-fileinput/js/locales/ru.js"></script>
+    <script src="{{ STATIC_URL }}vendors/bootstrap-fileinput/js/fileinput.min.js"></script>
+    <script src="{{ STATIC_URL }}vendors/bootstrap-fileinput/js/locales/ru.js"></script>
     
     <script src="{{ STATIC_URL }}/vendors/bootbox/bootbox.min.js"></script>
     

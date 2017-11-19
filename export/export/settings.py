@@ -11,6 +11,10 @@ DEBUG = (len(sys.argv) > 1 and sys.argv[1] == 'runserver')
 
 TEMPLATE_DEBUG = DEBUG
 
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda r: False, 
+}
+
 ADMINS = (
     ('picasso', 'it-support2@ruscon.global'),
 )
