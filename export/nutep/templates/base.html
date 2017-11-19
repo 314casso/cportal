@@ -1,0 +1,329 @@
+{% load paginator %}
+{% load staticfiles %}
+{% load thumbnail %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{{ title }}</title>
+
+    <!-- Bootstrap -->
+    <link href="{{ STATIC_URL }}vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{{ STATIC_URL }}vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="{{ STATIC_URL }}/vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="{{ STATIC_URL }}/vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <!-- bootstrap-progressbar -->
+    <link href="{{ STATIC_URL }}/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+	<!-- Fileinput -->
+	<link href="{{ STATIC_URL }}/vendors/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
+	<!-- Datatables -->
+    
+	{{ template_form.media.css }}
+
+    <!-- Custom Theme Style -->
+    <link href="{{ STATIC_URL }}build/css/custom.css?0.006" rel="stylesheet">
+  </head>
+
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a href="{% url 'services' %}" class="site_title"><i class="fa fa-ship"></i> <span>{{ title }}</span></a>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <!-- menu profile quick info -->
+            <div class="profile clearfix">
+              <div class="profile_pic">               
+                <img src="{% thumbnail request.user.profile.image 100x100 crop %}" alt="..." class="img-circle profile_img">                
+              </div>
+              <div class="profile_info">
+              	{% if request.user.is_authenticated %} <span>Здравствуйте,</span> 
+			  	{% else %}<a href="{% url 'login' %}">Войти</a>{% endif %}
+                <h2>{{ request.user.profile.fullname }}</h2>
+              </div>
+            </div>
+            <!-- /menu profile quick info -->
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <h3>Основное меню</h3>
+                <ul class="nav side-menu">
+                  <li><a><i class="fa fa-home"></i> Сервисы <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="{% url 'services' %}"> Панель управления</a></li>                      
+                    </ul>
+                  </li>                  
+                  
+                  <li><a><i class="fa fa-ship"></i> Рейсы <span class="fa fa-chevron-down"></span></a>
+
+                    <ul class="nav child_menu">
+                      {% regroup orders by voyage.vessel as vessel_list %}
+                    	{% for vessel in vessel_list  %}
+                        <li><a> {{ vessel.grouper }}<span class="fa fa-chevron-down"></span></a>
+                          <ul class="nav child_menu">
+                          	{% for order in vessel.list  %}
+                              <li class="sub_menu"><a href="{% url 'drafts' order.pk %}"> {{ order.voyage }} ({{ order.contract.line }})</a></li>
+                            {% endfor %}                            
+                          </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                  </li>
+                  
+                  <li><a><i class="fa fa-info-circle"></i>Информация <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/media/templates/export.basic.help.pdf">Документация</a></li>
+                      <li><a href="mailto:it-support2@ruscon.global">Запрос в поддержку</a></li>
+                      <li><a href="/media/templates/exportbl.xlsx">Скачать шаблон</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>             
+            </div>
+            <!-- /sidebar menu -->
+
+            <!-- /menu footer buttons -->
+            <div class="sidebar-footer hidden-small">              
+              <a data-toggle="tooltip" data-placement="top" title="Выйти" href="{% url 'logout' %}">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            <!-- /menu footer buttons -->
+          </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav>
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                  	<img src="{% thumbnail request.user.profile.image 100x100 crop %}" alt="...">                  	
+                    {{ request.user.profile.fullname }}
+                    <span class=" fa fa-angle-down"></span>
+                  </a>
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">                    
+                    <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out pull-right"></i> Выйти</a></li>
+                  </ul>
+                </li>               
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        {% block content %}
+        <div class="right_col" role="main">
+        
+        	<div class="page-title">
+              <div class="title_left">
+                <h3>Панель управления <small>сервис по оформлению экспортных документов</small></h3>
+              </div>
+          </div>
+
+          <div class="clearfix"></div>
+		
+          <p>
+            <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#modal-{{ template_form.key }}">
+            <i class="fa fa-upload"></i> Загрузить шаблон</button>
+          </p>
+
+          <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Шаблоны  <small>статус обработки загруженных файлов</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu" id="app-settings">
+                          <li>
+                            <a v-on:click="fetchData" href="#"><i class="fa fa-refresh fa-fw"></i> Обновить</a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content table-responsive">
+
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Действие</th>
+                        <th>Обновлено</th>
+                        <th>Судно</th>
+                        <th>Рейс</th>
+                        <th>ETA</th>
+                        <th>Шаблон</th>
+                        <th>Статус</th>
+                      </tr>
+                    </thead>
+                    <tbody id="app-templates" v-cloak>
+                      <tr class="datarow" v-for="item in items" v-on:dblclick="open(item.url)">
+                        <th scope="row"><a :href="item.url"><% item.id %></a></th>
+
+                        <td>
+                          <div class="dropdown">
+
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle">
+                              <i class="fa fa-bars fa-fw" aria-hidden="true"></i>
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-usermenu">
+                              <li>
+                                <a v-on:click="refresh(item.id)" href="#">
+                                  <i class="fa fa-spinner fa-fw"></i> Обновить
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        </td>
+
+                        <td :title="item.user">
+                          <% item.updated %>
+                        </td>
+                        <td><% item.vessel %></td>
+                        <td><a class="btn-link" :href="item.drafts_url"><% item.voyage %></a></td>
+                        <td><% item.eta %></td>
+                        <td><% item.filename %></td>
+                        <td :id="item.status_id" :class="item.status_class">
+                          <div v-html="item.load_image"></div>
+                          <% item.status %>
+                        </td>
+                      </tr>                    
+                    </tbody>
+                  </table>
+                  </div>
+                </div>
+              </div>
+           </div>
+                            
+              <!--  -->
+          <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Заявки  <small>шаблоны группируются в заявки по договору и рейсу</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                        <ul class="dropdown-menu" role="menu" id="app-voyage-settings">
+                          <li>
+                            <a v-on:click="fetchData" href="#"><i class="fa fa-refresh fa-fw"></i> Обновить</a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content table-responsive">        
+
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>           
+                      	<th>Заявка</th>
+                      	<th>Линия</th>
+                      	<th>Договор</th>                      	             
+                        <th>Рейс</th>
+                        <th>Судно</th>                        
+                        <th>ETA</th>
+                      </tr>
+                    </thead>
+                    <tbody id="app-orders" v-cloak>
+                      <tr class="datarow" v-for="item in items" v-on:dblclick="open(item.url)">
+                      	<th scope="row"><strong><a :href="item.url"><% item.id %></a></strong></th>
+                      	<td><% item.line %></td>
+                      	<td><% item.contract %></td>
+                        <td><a :href="item.url"><% item.voyage %></a></td>                       
+                        <td><% item.vessel %></td>                        
+                        <td><% item.eta %></td>                        
+                      </tr>                    
+                    </tbody>
+                  </table>
+                  </div>
+                </div>
+              </div>
+           </div>
+                  
+        <!--  -->
+        
+        <div class="clearfix"></div>      
+              
+        </div>
+        {% include 'modals/file_upload.html' with form=template_form %}
+        {% endblock content %}
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="pull-right">
+            ©1997-{% now "Y" %} «Рускон» <a href="http://ruscon.global">эксперт контейнерных перевозок</a>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="{{ STATIC_URL }}vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{{ STATIC_URL }}vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    
+    <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.3.3/vue.min.js"></script>
+        
+    <!-- FastClick -->
+    <script src="{{ STATIC_URL }}/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="{{ STATIC_URL }}/vendors/nprogress/nprogress.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="{{ STATIC_URL }}/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="{{ STATIC_URL }}/vendors/iCheck/icheck.min.js"></script>
+    <!-- Fileinput -->
+    <script src="{{ STATIC_URL }}/vendors/bootstrap-fileinput/js/fileinput.min.js"></script>
+    <script src="{{ STATIC_URL }}/vendors/bootstrap-fileinput/js/locales/ru.js"></script>
+    
+    <script src="{{ STATIC_URL }}/vendors/bootbox/bootbox.min.js"></script>
+    
+    {{ template_form.media.js }}
+        
+    <!-- Custom Theme Scripts -->
+    <script src="{{ STATIC_URL }}build/js/custom.js?0.008"></script>
+    
+    <!-- Datatables -->      
+       
+	
+  </body>
+</html>
