@@ -3,15 +3,13 @@ import datetime
 import os
 
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import (GenericForeignKey,
-                                                GenericRelation)
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.db import models
-from django.utils import timezone
-from django.utils.encoding import force_text, force_unicode
-from django.utils.formats import date_format
+from django.utils.encoding import force_unicode
 from uuslug import slugify
+from django.utils.translation import ugettext_lazy as _
+import hashlib
 
 
 def base_path(root, filename):    
@@ -30,6 +28,12 @@ def attachment_path(instance, filename):
 
 def userprofile_path(instance, filename):    
     root = u'profile/%s' % (instance.user,)    
+    return base_path(root, filename)
+
+
+def employee_path(instance, filename):
+    hash_object = hashlib.sha1(b'%s' % instance.domainname)    
+    root = u'employee/%s' % hash_object.hexdigest()    
     return base_path(root, filename)
 
 
@@ -97,17 +101,7 @@ class PrivateModel(ProcessDeletedModel):
     objects = PrivateModelManager()    
     class Meta:
         abstract = True
-
-
-class BaseModel(ProcessDeletedModel):
-    name = models.CharField('Наименование', max_length=150, db_index=True)
-    guid = models.CharField(max_length=50, null=True, db_index=True, unique=True)
-    def __unicode__(self):
-        return u'{0}'.format(self.name) 
-    class Meta:
-        ordering = ('name', )
-        abstract = True
-        
+    
 
 class HistoryMeta(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -148,325 +142,52 @@ class BaseError(models.Model):
         verbose_name = force_unicode('Ошибка')
         verbose_name_plural = force_unicode('Ошибки')
         ordering = ('id', )
-    
-
-class Vessel(BaseModel):
-    history = GenericRelation('HistoryMeta')    
-
-    class Meta:        
-        verbose_name = force_unicode('Судно')
-        verbose_name_plural = force_unicode('Суда')        
-    
-class Voyage(BaseModel):        
-    vessel = models.ForeignKey(Vessel, null=True, related_name="voyages")
-    flag = models.CharField(max_length=100, null=True, blank=True) 
-    eta = models.DateTimeField(null=True, blank=True)
-    history = GenericRelation('HistoryMeta')    
-      
-    class Meta:
-        verbose_name = force_unicode('Рейс')
-        verbose_name_plural = force_unicode('Рейсы')
-        unique_together = ('vessel', 'name')    
-
-    def as_dict(self):
-        return {
-            "id": self.id,           
-            "vessel": force_text(self.vessel),
-            "voyage": force_text(self.name),
-            "eta": date_format(timezone.localtime(self.eta), "d.m.Y"),            
-        }        
 
 
-class ServiceProvided(models.Model):
-    PORUCHENIE = '00001'    
-    OTHERDOCS = '00002'
-    SERVICES = (
-        (PORUCHENIE, force_unicode('Экспортные поручения')),
-        (OTHERDOCS, force_unicode('Прочие документы')),
-    )
-    service = models.CharField(choices=SERVICES, max_length=5, db_index=True, unique=True)
-    def __unicode__(self):
-        return u'{0}'.format(self.get_service_display()) 
-    class Meta:
-        verbose_name = force_unicode('Услуга')
-        verbose_name_plural = force_unicode('Услуги')
-    
-    
-class Line(PrivateModel): 
-    name = models.CharField('Наименование', max_length=150, db_index=True)
-    guid = models.CharField(max_length=50, null=True, db_index=True)
-    services = models.ManyToManyField(ServiceProvided, blank=True)       
-    def __unicode__(self):
-        return u'{0}'.format(self.name) 
-    class Meta:
-        verbose_name = force_unicode('Линия')
-        verbose_name_plural = force_unicode('Линии')
-        ordering = ('name', )
-        
-        
-class Terminal(BaseModel):       
-    class Meta:
-        verbose_name = force_unicode('Терминал')
-        verbose_name_plural = force_unicode('Терминалы')
-
-                   
-class Contract(PrivateModel):
-    name = models.CharField('Наименование', max_length=150, db_index=True)
-    guid = models.CharField(max_length=50, null=True, db_index=True)    
-    line = models.ForeignKey(Line, related_name="contracts")
-    terminal = models.ForeignKey(Terminal)
-    startdate = models.DateTimeField(db_index=True)
-    expired = models.DateTimeField(db_index=True)    
-    def __unicode__(self):
-        return u'{0}'.format(self.name) 
-    class Meta:
-        verbose_name = force_unicode('Договор')
-        verbose_name_plural = force_unicode('Договоры')
-        ordering = ('name', )
-
-
-class UserProfile(models.Model):
-    guid = models.CharField(max_length=50, null=True, blank=True)
+class UserProfile(models.Model):    
+    crm_id = models.CharField(max_length=36, blank=True, null=True)
+    name = models.CharField(_('company name'), max_length=100, blank=True)
+    fullname  = models.CharField(_('company full name'), max_length=150, blank=True)
     user = models.OneToOneField(User, unique=True, related_name='profile')
-    lines = models.ManyToManyField(Line, blank=True)
-    image = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)
+    image = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)    
+    def get_fullname(self):
+        return u'%s' % (self.fullname)    
+    def __unicode__(self):
+        return u'{0}'.format(self.fullname)
+
+
+class Employee(models.Model):
+    domainname = models.CharField(max_length=50, unique=True, db_index=True)
+    crm_id = models.CharField(max_length=36, blank=True, null=True, unique=True, db_index=True)       
+    portal_id = models.IntegerField(blank=True, null=True, unique=True)
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    middle_name = models.CharField(_('middle name'), max_length=30, blank=True)
+    job_title = models.CharField(_('job title'), max_length=100, null=True, blank=True)
+    image = models.ImageField(upload_to=employee_path, blank=True, null=True,)
+    head = models.ForeignKey('self', blank=True, null=True)
+    mobile = models.CharField(_('mobile'), max_length=20, blank=True)
+    phone = models.CharField(_('phone'), max_length=20, blank=True, null=True,)   
+    email = models.EmailField(_('email'), blank=True)
+    skype = models.CharField(_('skype'), max_length=20, blank=True, null=True,)  
+    users = models.ManyToManyField(User, through='CompanyManager', related_name='managers')  
     def fullname(self):
-        return u"%s %s" % (self.user.first_name, self.user.last_name)    
-    def __unicode__(self):
-        return u'{0}'.format(self.user) 
-    
+        return u"%s %s %s" % (self.last_name, self.first_name, self.middle_name)    
+    def __unicode__(self):        
+        return u'{0} {1} ({2})'.format(self.first_name, self.last_name, self.domainname)    
 
-class Draft(models.Model):
-    name = models.CharField('BL', max_length=150, db_index=True)        
-    guid = models.CharField(max_length=50)        
-    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.PROTECT)    
-    date = models.DateTimeField()
-    shipper = models.CharField(max_length=255, null=True, blank=True)
-    consignee = models.CharField(max_length=255, null=True, blank=True)    
-    voyage = models.ForeignKey(Voyage, related_name="drafts", null=True)
-    finalDestination = models.CharField(max_length=255, null=True, blank=True)
-    POD = models.CharField(max_length=150, null=True, blank=True)
-    POL = models.CharField(max_length=150, null=True, blank=True)
-    finstatus = models.BooleanField(default=False)
-    status = models.BooleanField(default=False)
-    poruchenie = models.BooleanField(default=False)
-    poruchenieNums = models.CharField(max_length=150, null=True, blank=True)
-    notify = models.CharField(max_length=255, null=True, blank=True)
-    line = models.ForeignKey(Line)
-    order = models.ForeignKey("Order", related_name='drafts', blank=True, null=True)
-    
+
+class Scope(models.Model):
+    name = models.CharField(_('name'), max_length=50)
     def __unicode__(self):
         return u'{0}'.format(self.name)
     
-    def active_template(self):
-        return self.order.active_template()
 
-    def contract(self):
-        return self.order.contract
-     
-    class Meta:
-        verbose_name = force_unicode('Коносамент')
-        verbose_name_plural = force_unicode('Коносаменты')
-        ordering = ('name', )  
-
-
-class Mission(models.Model):
-    name = models.CharField(max_length=12, db_index=True)
-    guid = models.CharField(max_length=50)        
-    draft = models.ForeignKey(Draft, related_name="missions", on_delete=models.CASCADE)
-    files = GenericRelation(File)
-    reception_date = models.DateTimeField(blank=True, null=True)
-    issue_date = models.DateTimeField(blank=True, null=True)
+class CompanyManager(models.Model):
+    employee = models.ForeignKey(Employee, related_name='membership')
+    user = models.ForeignKey(User, related_name='membership')
+    scope = models.ForeignKey(Scope, blank=True, null=True,)
     
+    def __unicode__(self):
+        return u"%s is in group %s (as %s)" % (self.employee, self.user, self.scope)
         
-    def __unicode__(self):
-        return u'{0}'.format(self.name)
-    
-    def pdf_files(self):
-        return self.files.filter(title__iendswith='pdf')
-    
-    def xlsx_files(self):
-        return self.files.filter(title__iendswith='xlsx')
-    
-    class Meta:
-        verbose_name = force_unicode('Поручение')
-        verbose_name_plural = force_unicode('Поручения')
-        ordering = ('name', )  
-
-            
-class Container(models.Model):
-    name = models.CharField(max_length=12, db_index=True)
-    SOC = models.BooleanField(default=False)
-    size = models.CharField(max_length=2, db_index=True)
-    type = models.CharField(max_length=4, db_index=True)
-    line = models.ForeignKey(Line, null=True, blank=True)
-    seal = models.CharField(max_length=150, null=True, blank=True)
-    cargo = models.CharField(max_length=255, null=True, blank=True)
-    netto = models.DecimalField(null=True, blank=True, max_digits=8, decimal_places=3)
-    gross = models.DecimalField(null=True, blank=True, max_digits=8, decimal_places=3)
-    tare = models.DecimalField(null=True, blank=True, max_digits=8, decimal_places=3)
-    package = models.CharField(max_length=150, null=True, blank=True)
-    quantity = models.PositiveIntegerField(null=True, blank=True)
-    draft = models.ForeignKey(Draft, related_name="containers", on_delete=models.CASCADE)
-    def __unicode__(self):
-        return u'{0}'.format(self.name) 
-    class Meta:
-        verbose_name = force_unicode('Контейнер')
-        verbose_name_plural = force_unicode('Контейнеры')
-        ordering = ('name', ) 
-                              
-
-class Readiness(models.Model):
-    size = models.CharField(max_length=2, db_index=True)
-    type = models.CharField(max_length=4, db_index=True)
-    ordered = models.PositiveIntegerField(null=True, blank=True)
-    done = models.PositiveIntegerField(null=True, blank=True)
-    draft = models.ForeignKey(Draft, related_name="readiness", on_delete=models.CASCADE)
-    def __unicode__(self):
-        return u'{0}'.format(self.id) 
-    class Meta:
-        verbose_name = force_unicode('Готовность')
-        verbose_name_plural = force_unicode('Готовность')
-        ordering = ('id', ) 
-
-
-class Order(PrivateModel):
-    voyage = models.ForeignKey(Voyage, blank=True, null=True, on_delete=models.PROTECT,
-                               related_name="orders")
-    contract = models.ForeignKey(Contract, blank=True, null=True, on_delete=models.PROTECT)
-    history = GenericRelation('HistoryMeta')
-    
-    files = GenericRelation(File)    
-
-    def __unicode__(self):
-        return u'%s %s' % (self.voyage, self.contract) 
-    
-    class Meta:
-        unique_together = ('voyage', 'contract')
-        verbose_name = force_unicode('Заявка')
-        verbose_name_plural = force_unicode('Заявки')
-    
-    def active_template(self):
-        return self.templates.first()
-
-    def as_dict(self):        
-        return {
-            "id": self.id,
-            "line": self.contract.line.name,
-            "contract": self.contract.name,           
-            "vessel": force_text(self.voyage.vessel),
-            "voyage": force_text(self.voyage),
-            "eta": date_format(timezone.localtime(self.voyage.eta), "d.m.Y") if self.voyage.eta else '',  
-            "url": reverse('drafts', kwargs={'order': self.pk}),                                
-        } 
-
-
-    def drafts_done(self):        
-        return self.drafts.filter(poruchenie=True)    
-        
-    def drafts_total(self):        
-        return self.drafts.all()
-        
-    def drafts_readiness(self):        
-        total = float(len(self.drafts_total()))
-        if not total:
-            return 0
-        done = float(len(self.drafts_done()))        
-        return int(done / total * 100) 
-    
-
-class UploadedTemplateManager(PrivateModelManager):    
-    def for_user(self, user):        
-        return super(UploadedTemplateManager, self).for_user(user).defer("xml_response")
-    
-
-class UploadedTemplate(PrivateModel):
-    NEW = 1
-    INPROCESS = 2
-    PROCESSED = 3
-    REFRESH = 4
-    ERROR = 500
-    
-    STATUS_CHOICES = (
-        (NEW, force_unicode('Новый')),
-        (INPROCESS, force_unicode('Успешно загружен')),
-        (PROCESSED, force_unicode('Обработан')),
-        (ERROR, force_unicode('Ошибка')),     
-        (REFRESH, force_unicode('Обновление данных')),
-    )
-    
-    objects = UploadedTemplateManager()    
-    attachment = models.FileField('Файл шаблона', upload_to=attachment_path) 
-    status = models.IntegerField(choices=STATUS_CHOICES, default=NEW, db_index=True, blank=True)
-    http_code = models.CharField('HTTP Код', max_length=50, null=True, blank=True)
-    xml_response = models.TextField('XML ответ', null=True, blank=True)        
-    order = models.ForeignKey(Order, blank=True, null=True, on_delete=models.CASCADE, related_name="templates")
-    history = GenericRelation('HistoryMeta')    
-    errors = GenericRelation('BaseError')
-    md5_hash = models.CharField('md5 hash', max_length=32, null=True, blank=True, db_index=True)
-    is_override = models.BooleanField(default=False)
-    services = models.ManyToManyField(ServiceProvided, blank=True)
-    
-    def set_status(self):        
-        if len(self.errors.all()): # pylint: disable=E1101
-            self.status = UploadedTemplate.ERROR        
-        else:
-            self.status = UploadedTemplate.INPROCESS
-        self.save()
-    
-    def __unicode__(self):
-        return u'{0}'.format(self.attachment.name)  
-
-    def filename(self):
-        return os.path.basename(self.attachment.name)
-    
-    def status_class(self):
-        mapper = {
-            self.NEW: 'new',
-            self.PROCESSED: 'success',
-            self.INPROCESS: 'info',
-            self.ERROR: 'danger',
-            self.REFRESH: 'refresh',
-        }
-        return mapper.get(self.status)
-    
-    @property
-    def voyage(self):
-        return self.order.voyage
-    
-    @property
-    def vessel(self):
-        return self.order.voyage.vessel
-    
-    @property
-    def contract(self):
-        return self.order.contract
-    
-    @property
-    def line(self):
-        return self.order.contract.line
-
-    def as_dict(self):
-        return {
-            "id": self.id,            
-            "status": self.get_status_display(),
-            "vessel": force_text(self.vessel),
-            "voyage": force_text(self.voyage),
-            "eta": date_format(timezone.localtime(self.voyage.eta), "d.m.Y") if self.voyage.eta else "",
-            "contract": force_text(self.contract),
-            "line": force_text(self.line),
-            "filename": force_text(self.filename()),
-            "updated":  date_format(timezone.localtime(self.last_event().date), "d.m.Y H:i") if self.last_event() else "",
-            "user": force_text(self.last_event().user),
-            "url": reverse('template-details', kwargs={'pk': self.pk}),
-            "status_class": self.status_class(),
-            "status_id": "%s-status" % self.id,
-            "refreshing": self.status == self.REFRESH,            
-            "orderid": self.order.id,
-            "drafts_url": reverse('drafts', kwargs={'order': self.order.pk}),
-        }
-
-    class Meta:
-        verbose_name = force_unicode('Шаблон')
-        verbose_name_plural = force_unicode('Шаблоны')
-        ordering = ('-id', )

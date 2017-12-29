@@ -2,19 +2,18 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-from django.conf import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('nutep', '0001_initial'),
+        ('nutep', '0003_employee_job_title'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userprofile',
-            name='user',
-            field=models.OneToOneField(related_name='profile', to=settings.AUTH_USER_MODEL),
+            model_name='employee',
+            name='job_title',
+            field=models.CharField(max_length=30, null=True, verbose_name='middle name', blank=True),
         ),
     ]

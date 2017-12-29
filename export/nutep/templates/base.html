@@ -54,8 +54,7 @@
               <div class="profile_info">
               	{% if request.user.is_authenticated %} <span>Здравствуйте,</span> 
 			  	{% else %}<a href="{% url 'login' %}">Войти</a>{% endif %}
-                <h2>{{ request.user.profile.fullname }}</h2>
-                <h5>RUSCON</h5>
+                <h2>{{ request.user.profile.fullname }}</h2>                
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -199,91 +198,9 @@
 		
 		<div class="row">
 		
-		<div class="col-md-3 col-xs-12 widget widget_tally_box">
-          <div class="x_panel fixed_height_390">
-            <div class="x_content">
-			<h4 style="text-align:center">Ваш менеджер</h4>
-              <div class="flex">
-                <ul class="list-inline widget_profile_box">
-                  <li>
-                    <a href="skype:skypeID?chat">
-                      <i class="fa fa-skype"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <img src="{% thumbnail request.user.profile.image 100x100 crop %}" alt="..." class="img-circle profile_img">
-                  </li>
-                  <li>
-                    <a href="mailto:{{ request.user.email }}">
-                      <i class="fa fa-envelope"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <h3 class="name">Павел</h3>
-              <h5 class="name">Саввин</h5>
-			  
-              <div class="flex">
-                <ul class="list-inline count2">
-                  <li style="width:90%">
-                    <h5><i class="fa fa-phone"></i> +7 900 0003-00-00</h5>
-                    
-                  </li>                  
-                </ul>
-              </div>
-              <p>
-                <p>
-		          <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#modal-{{ template_form.key }}">
-		          <i class="fa fa-check-circle"></i> Оценить</button>
-		        </p>
-              </p>
-            </div>
-          </div>
-        </div>
+		{% include "inc/profile.html" with manager=manager %} 
 		
-		<div class="col-md-3 col-xs-12 widget widget_tally_box">
-          <div class="x_panel fixed_height_390">
-            <div class="x_content">
-			<h4 style="text-align:center">Руководитель менеджера</h4>
-              <div class="flex">
-                <ul class="list-inline widget_profile_box">
-                  <li>
-                    <a href="skype:skypeID?chat">
-                      <i class="fa fa-skype"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <img src="{% thumbnail request.user.profile.image 100x100 crop %}" alt="..." class="img-circle profile_img">
-                  </li>
-                  <li>
-                    <a href="mailto:{{ request.user.email }}">
-                      <i class="fa fa-envelope"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <h3 class="name">Павел</h3>
-              <h5 class="name">Саввин</h5>
-			  
-              <div class="flex">
-                <ul class="list-inline count2">
-                  <li style="width:90%">
-                    <h5><i class="fa fa-phone"></i> +7 900 0003-00-00</h5>
-                    
-                  </li>                  
-                </ul>
-              </div>
-              <p>
-                <p>
-		          <button type="button" class="btn btn-default btn-primary" data-toggle="modal" data-target="#modal-{{ template_form.key }}">
-		          <i class="fa fa-check-circle"></i> Оценить</button>
-		        </p>
-              </p>
-            </div>
-          </div>
-        </div>
+		{% include "inc/profile.html" with manager=head %}
                 
 					
 		<div class="col-md-4">
@@ -295,54 +212,34 @@
                   <div class="x_content" style="display: block;">
                     <article class="media event">
                       <a class="pull-left date">
-                        <p class="month">April</p>
-                        <p class="day">23</p>
+                        <p class="month">Окт</p>
+                        <p class="day">20</p>
                       </a>
                       <div class="media-body">
-                        <a class="title" href="#">Item One Title</a>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        <a class="title" href="#">РУСКОН повышает производительность</a>
+                        <p>Приобретение осуществлено в рамках реализации долгосрочной стратегии, направленной на интеграцию операторского и терминального бизнесов Группы.</p>
                       </div>
                     </article>
                     <article class="media event">
                       <a class="pull-left date">
-                        <p class="month">April</p>
-                        <p class="day">23</p>
+                        <p class="month">Сен</p>
+                        <p class="day">15</p>
                       </a>
                       <div class="media-body">
-                        <a class="title" href="#">Item Two Title</a>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        <a class="title" href="#">Новый поездной сервис</a>
+                        <p>Запущен новый поездной контейнерный сервис Москва – Иркутск</p>
                       </div>
                     </article>
                     <article class="media event">
                       <a class="pull-left date">
-                        <p class="month">April</p>
-                        <p class="day">23</p>
+                        <p class="month">Авг</p>
+                        <p class="day">31</p>
                       </a>
                       <div class="media-body">
-                        <a class="title" href="#">Item Two Title</a>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        <a class="title" href="#">РУСКОН повышает производительность</a>
+                        <p>Терминал Рускон в Новороссийске вышел на качественно новый уровень обработки сыпучих грузов</p>
                       </div>
-                    </article>
-                    <article class="media event">
-                      <a class="pull-left date">
-                        <p class="month">April</p>
-                        <p class="day">23</p>
-                      </a>
-                      <div class="media-body">
-                        <a class="title" href="#">Item Two Title</a>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                      </div>
-                    </article>
-                    <article class="media event">
-                      <a class="pull-left date">
-                        <p class="month">April</p>
-                        <p class="day">23</p>
-                      </a>
-                      <div class="media-body">
-                        <a class="title" href="#">Item Three Title</a>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                      </div>
-                    </article>
+                    </article>                    
                   </div>
                 </div>
               </div>
@@ -427,8 +324,7 @@
         
         <div class="clearfix"></div>      
               
-        </div>
-        {% include 'modals/file_upload.html' with form=template_form %}
+        </div>        
         {% endblock content %}
         <!-- /page content -->
 

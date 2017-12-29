@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('nutep', '0005_auto_20170407_1437'),
+        ('nutep', '0002_auto_20171220_1143'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='uploadedtemplate',
-            name='md5_hash',
-            field=models.CharField(db_index=True, max_length=32, null=True, verbose_name=b'md5 hash', blank=True),
+            model_name='employee',
+            name='job_title',
+            field=models.CharField(max_length=30, verbose_name='middle name', blank=True),
         ),
     ]

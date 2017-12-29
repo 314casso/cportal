@@ -3,11 +3,7 @@ from django.conf.urls import include, patterns, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
-from nutep.views import (DraftDetailView, DraftListView, ServiceView,
-                         TemplateDeleteView, TemplateDetailView,
-                         get_active_templates, get_template_status, landing,
-                         upload_file, get_last_orders, get_loading_list,
-    get_mission_xlsx)
+from nutep.views import (landing, ServiceView)
 
 admin.autodiscover()
 
@@ -25,14 +21,8 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('', 
-    url(r'^$', landing, name='landing'),
-    url(r'^services/$', ServiceView.as_view(), name='services'),
-    url(r'^upload/$', upload_file, name='upload'),
-    url(r'^deletetemplate/(?P<pk>[0-9]+)$', TemplateDeleteView.as_view(), name='delete-template'),  
-    url(r'^gettemplate/(?P<pk>[0-9]+)$', get_template_status, name='get-template'),
-    url(r'^templatedetails/(?P<pk>[0-9]+)$', TemplateDetailView.as_view(), name='template-details'),
-    url(r'^drafts/(?P<order>[0-9]+)$', DraftListView.as_view(), name='drafts'),
-    url(r'^draftdetails/(?P<pk>[0-9]+)$', DraftDetailView.as_view(), name='draft-details'),
+    url(r'^$', landing, name='landing'), 
+    url(r'^services/$', ServiceView.as_view(), name='services'),   
 )
 
 urlpatterns += patterns('',
@@ -44,11 +34,7 @@ urlpatterns += patterns('',
 )
 
 urlpatterns += patterns('',
-    url(r'^activetemplates/', get_active_templates, name="active-templates"),
-    url(r'^getlastorders/', get_last_orders, name="get-last-orders"),
-    url(r'^getloadinglist/(?P<pk>[0-9]+)$', get_loading_list, name="get-loading-list"),
-    url(r'^getmissionxlsx/(?P<pk>[0-9]+)$', get_mission_xlsx, name="get-mission-xlsx"),
-    
+        
 )
 
 if settings.DEBUG:

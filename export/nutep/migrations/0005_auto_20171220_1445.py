@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('nutep', '0021_auto_20170622_1632'),
+        ('nutep', '0004_auto_20171220_1442'),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='container',
-            name='type',
-            field=models.CharField(max_length=4, db_index=True),
+            model_name='employee',
+            name='domainname',
+            field=models.CharField(max_length=50),
         ),
     ]
