@@ -10,6 +10,8 @@ from django.utils.encoding import force_unicode
 from uuslug import slugify
 from django.utils.translation import ugettext_lazy as _
 import hashlib
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.contrib.postgres.fields.array import ArrayField
 
 
 def base_path(root, filename):    
@@ -37,14 +39,31 @@ def employee_path(instance, filename):
     return base_path(root, filename)
 
 
-class File(models.Model):
+class File(models.Model):    
+    REVISE = 1    
+    
+    TYPE_CHOICES = (
+        (REVISE, 'Revise'),
+    )
+    
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     title = models.CharField(blank=True, null=True, max_length=255)    
     file = models.FileField(upload_to=attachment_path, blank=True, null=True,)
     note = models.CharField(blank=True, null=True, max_length=255)
-        
+    type = models.IntegerField(choices=TYPE_CHOICES, blank=True, null=True,)
+    date = models.DateTimeField(blank=True, auto_now=True, db_index=True, null=True)
+    
+    def as_dict(self):
+        result = {            
+            'title': self.title,            
+            'updated': self.date.strftime('%d.%m.%Y %H:%M'),
+            'url': self.file.url,
+            'note': self.note,
+            }
+        return result
+    
     def __unicode__(self):
         return force_unicode(self.title) 
 
@@ -145,13 +164,20 @@ class BaseError(models.Model):
 
 
 class UserProfile(models.Model):    
-    crm_id = models.CharField(max_length=36, blank=True, null=True)
+    crm_guids = ArrayField(models.CharField(max_length=36), blank=True, null=True)
+    ukt_guids = ArrayField(models.CharField(max_length=36), blank=True, null=True)
     name = models.CharField(_('company name'), max_length=100, blank=True)
-    fullname  = models.CharField(_('company full name'), max_length=150, blank=True)
+    fullname = models.CharField(_('company full name'), max_length=150, blank=True)
     user = models.OneToOneField(User, unique=True, related_name='profile')
-    image = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)    
+    image = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)
+    details = JSONField(blank=True, null=True,)
+    INN = models.CharField(_('INN'), max_length=14, blank=True, null=True,)   
+    KPP = models.CharField(_('KPP'), max_length=10, blank=True, null=True,)
+    payers = models.ManyToManyField('self', blank=True,)
+    
     def get_fullname(self):
         return u'%s' % (self.fullname)    
+    
     def __unicode__(self):
         return u'{0}'.format(self.fullname)
 
@@ -171,14 +197,17 @@ class Employee(models.Model):
     email = models.EmailField(_('email'), blank=True)
     skype = models.CharField(_('skype'), max_length=20, blank=True, null=True,)  
     users = models.ManyToManyField(User, through='CompanyManager', related_name='managers')  
+    
     def fullname(self):
         return u"%s %s %s" % (self.last_name, self.first_name, self.middle_name)    
+    
     def __unicode__(self):        
         return u'{0} {1} ({2})'.format(self.first_name, self.last_name, self.domainname)    
 
 
 class Scope(models.Model):
     name = models.CharField(_('name'), max_length=50)
+    
     def __unicode__(self):
         return u'{0}'.format(self.name)
     
@@ -190,4 +219,27 @@ class CompanyManager(models.Model):
     
     def __unicode__(self):
         return u"%s is in group %s (as %s)" % (self.employee, self.user, self.scope)
+
+
+class InfoSource(models.Model):
+    name = models.CharField(u'Наименование', max_length=150, db_index=True)
+    
+    def __unicode__(self):
+        return u'{0}'.format(self.name)
+    
+
+class News(ProcessDeletedModel):    
+    date = models.DateTimeField(db_index=True)
+    title = models.CharField(_('title'), max_length=150)
+    summary = models.CharField(_('summary'), max_length=250)
+    url = models.CharField(_('url'), max_length=250)
+    info_source = models.ForeignKey(InfoSource)
+    
+    class Meta:
+        ordering = ('-date', )
+    
+    def __unicode__(self):
+        return u'{0}'.format(self.title)
+
+
         

@@ -24,9 +24,16 @@
     <link href="{{ STATIC_URL }}/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
 	<!-- Fileinput -->
 	<link href="{{ STATIC_URL }}/vendors/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
-	<!-- Datatables -->
+	<!-- Datatables -->    
+    <link href="{{ STATIC_URL }}/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
     
-	{{ template_form.media.css }}
+    <!-- PNotify -->
+    <link href="{{ STATIC_URL }}/vendors/pnotify/dist/pnotify.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}/vendors/pnotify/dist/pnotify.buttons.css" rel="stylesheet">    
+    
+    
+    
+	{{ revise_form.media.css }}
 
     <!-- Custom Theme Style -->
     <link href="{{ STATIC_URL }}build/css/custom.css?0.006" rel="stylesheet">
@@ -166,30 +173,15 @@
           <!-- top tiles -->
           <div class="row tile_count">
             <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-clock-o"></i> Дата первой сделки</span>
-              <div class="count">05.11.09</div>
-              <span class="count_bottom"><i class="green">2 937 </i> дней сотрудничества</span>
+              <span class="count_top"><i class="fa fa-clock-o"></i> Дата первой сделки</span>              
+              <div class="count">{{ dealstats.dealdate|date:"d.m.y" }}</div>
+              <span class="count_bottom"><i class="green">{{ dealstats.days_together }}</i> дней сотрудничества</span>
             </div>
             <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
               <span class="count_top"><i class="fa fa-shopping-bag"></i> Общее количество сделок</span>
-              <div class="count">523</div>
-              <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>23 </i> за последний месяц</span>
-            </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-briefcase"></i> Импорт TEU</span>
-              <div class="count green">2500</div>
-              <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>200 </i> За последний месяц</span>
-            </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-briefcase"></i> Экспорт TEU</span>
-              <div class="count">4567</div>
-              <span class="count_bottom"><i class="red"><i class="fa fa-sort-desc"></i>120 </i> За последний месяц</span>
-            </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-              <span class="count_top"><i class="fa fa-briefcase"></i> Оказано услуг USD</span>
-              <div class="count">10 230</div>
-              <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>1002 </i> За последний месяц</span>
-            </div>            
+              <div class="count">{{ dealstats.totaldeals }}</div>
+              <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>{{ dealstats.lastmonth }} </i> за последний месяц</span>
+            </div>                       
           </div>
           <!-- /top tiles -->
                   
@@ -203,126 +195,86 @@
 		{% include "inc/profile.html" with manager=head %}
                 
 					
-		<div class="col-md-4">
-                <div class="x_panel">
-                  <div class="x_title">
-                    <h2>Новости группы<small>ruscon.blobal</small></h2>                    
-                    <div class="clearfix"></div>
-                  </div>
-                  <div class="x_content" style="display: block;">
-                    <article class="media event">
-                      <a class="pull-left date">
-                        <p class="month">Окт</p>
-                        <p class="day">20</p>
-                      </a>
-                      <div class="media-body">
-                        <a class="title" href="#">РУСКОН повышает производительность</a>
-                        <p>Приобретение осуществлено в рамках реализации долгосрочной стратегии, направленной на интеграцию операторского и терминального бизнесов Группы.</p>
-                      </div>
-                    </article>
-                    <article class="media event">
-                      <a class="pull-left date">
-                        <p class="month">Сен</p>
-                        <p class="day">15</p>
-                      </a>
-                      <div class="media-body">
-                        <a class="title" href="#">Новый поездной сервис</a>
-                        <p>Запущен новый поездной контейнерный сервис Москва – Иркутск</p>
-                      </div>
-                    </article>
-                    <article class="media event">
-                      <a class="pull-left date">
-                        <p class="month">Авг</p>
-                        <p class="day">31</p>
-                      </a>
-                      <div class="media-body">
-                        <a class="title" href="#">РУСКОН повышает производительность</a>
-                        <p>Терминал Рускон в Новороссийске вышел на качественно новый уровень обработки сыпучих грузов</p>
-                      </div>
-                    </article>                    
-                  </div>
+	  		<div class="col-md-4">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>Новости группы<small>ruscon.blobal</small></h2>                    
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content" style="display: block;">
+                	{% for article in news %}
+                	<article class="media event">
+                    <a class="pull-left date">
+                      <p class="month">{{ article.date|date:"M" }}</p>
+                      <p class="day">{{ article.date|date:"d" }}</p>
+                    </a>
+                    <div class="media-body">
+                      <a class="title" href="{{ article.url }}">{{ article.title }}</a>
+                      <p>{{ article.summary }}</p>
+                    </div>
+                  </article>
+                 	{% endfor %}
                 </div>
               </div>
+            </div>
 			
 		</div>
 		
 		<div class="clearfix"></div>
 		
-		<div class="row">
-            <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="dashboard_graph">
+		<div id="app-settings">            				
+			<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#reviseFormModal">
+		  		<i class="fa fa-spinner fa-pulse fa-lg fa-fw loading"></i> Запрос ведомости
+			</button>
 
-                <div class="row x_title">
-                
-                  <div class="col-md-6">
-                    <h3>Статистика по объемам перевозок <small>импорт/экспорт в TEU</small></h3>
-                  </div>
-                                    
-                </div>
+            <div id="error-message" class="alert alert-danger">
+                <strong>Ошибка!</strong> <% error %>
+            </div>
+        
+        </div>
+		
+		<!-- Button trigger modal -->
+		
 
-                <div class="col-md-9 col-sm-9 col-xs-9">
-                  <div id="chart_plot_01" class="demo-placeholder"></div>
-                </div>
-                
-                
-                <div class="col-md-3 col-sm-3 col-xs-12 bg-white">
+			<div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
                   <div class="x_title">
-                    <h2>Дополнительные показатели</h2>
+                    <h2>Ведомости взаиморасчетов <small>последние пять загруженных файлов</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>                      
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      </li>
+                    </ul>
                     <div class="clearfix"></div>
                   </div>
+                  <div class="x_content table-responsive">
 
-                  <div class="col-md-12 col-sm-12 col-xs-6">
-                    <div>
-                      <p>Показатель 1</p>
-                      <div class="">
-                        <div class="progress progress_sm" style="width: 76%;">
-                          <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="80" aria-valuenow="78" style="width: 80%;"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <p>Показатель 1</p>
-                      <div class="">
-                        <div class="progress progress_sm" style="width: 76%;">
-                          <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="60" aria-valuenow="59" style="width: 60%;"></div>
-                        </div>
-                      </div>
-                    </div>
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>                                                
+                        <th>Дата запроса</th>
+                        <th>Файл</th>
+                        <th>Период</th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody id="app-revise" v-cloak>
+                      <tr class="datarow" v-for="item in items" v-on:dblclick="open(item.url)">
+                        <th scope="row"><a :href="item.url"><% item.updated %></a></th>
+                                             
+                        <td><a :href="item.url"><% item.title %></a></td>
+                        <td><% item.note %></td>
+                        
+                      </tr>                    
+                    </tbody>
+                  </table>
                   </div>
-                  <div class="col-md-12 col-sm-12 col-xs-6">
-                    <div>
-                      <p>Показатель 3</p>
-                      <div class="">
-                        <div class="progress progress_sm" style="width: 76%;">
-                          <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="40" aria-valuenow="39" style="width: 40%;"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <p>Показатель 4</p>
-                      <div class="">
-                        <div class="progress progress_sm" style="width: 76%;">
-                          <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="50" aria-valuenow="49" style="width: 50%;"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
-                
-                
-                <div class="clearfix"></div>
               </div>
-            </div>
-            
-           
+           </div>
 
-          </div>
-          
-          
-		<br>
-        
-        <div class="clearfix"></div>      
               
         </div>        
         {% endblock content %}
@@ -338,6 +290,30 @@
         <!-- /footer content -->
       </div>
     </div>
+
+<!-- Modal -->
+<div class="modal fade" id="reviseFormModal" role="dialog" aria-labelledby="reviseFormModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    <form data-action="{% url 'revise' %}" id="reviseFormModalForm">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="reviseFormModalLabel">Запрос ведомости взаиморасчетов</h4>
+      </div>
+      <div class="modal-body">
+      
+      {% csrf_token %}
+      {{ revise_form.as_p }}
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+        <button id="reviseFormModalSubmit" type="submit" class="btn btn-primary">Отправить</button>
+      </div>
+    </form>    
+    </div>
+  </div>
+</div>
 
     <!-- jQuery -->
     <script src="{{ STATIC_URL }}vendors/jquery/dist/jquery.min.js"></script>
@@ -370,6 +346,11 @@
     <script src="{{ STATIC_URL }}vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
     <script src="{{ STATIC_URL }}vendors/flot.curvedlines/curvedLines.js"></script>
     
+    <script src="{{ STATIC_URL }}vendors/moment/min/moment.min.js"></script>
+    <script src="{{ STATIC_URL }}vendors/moment/locale/ru.js"></script>
+    
+    <script src="{{ STATIC_URL }}vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    
     <script src="{{ STATIC_URL }}vendors/DateJS/build/date.js"></script>
     
     <!-- Fileinput -->
@@ -378,10 +359,14 @@
     
     <script src="{{ STATIC_URL }}/vendors/bootbox/bootbox.min.js"></script>
     
-    {{ template_form.media.js }}
+    <!-- PNotify -->
+    <script src="{{ STATIC_URL }}vendors/pnotify/dist/pnotify.js"></script>
+    <script src="{{ STATIC_URL }}vendors/pnotify/dist/pnotify.buttons.js"></script>    
+    
+    {{ revise_form.media.js }}
         
     <!-- Custom Theme Scripts -->
-    <script src="{{ STATIC_URL }}build/js/custom.js?0.008"></script>
+    <script src="{{ STATIC_URL }}build/js/custom.js?0.011"></script>
     
     <!-- Datatables -->      
        

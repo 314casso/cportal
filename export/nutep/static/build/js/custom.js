@@ -5301,34 +5301,55 @@ $(function() {
 	});	
 });
 
-var myApp;
-myApp = myApp || (function () {
-    var pleaseWaitDiv = $('<div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false"><div class="alert alert-info"><h1>Подождите, идет загрузка данных...</h1></div></div>');
-    return {
-        showPleaseWait: function() {
-            pleaseWaitDiv.modal();
-        },
-        hidePleaseWait: function () {
-            pleaseWaitDiv.modal('hide');
-        },
-
-    };
-})();
-
-
 $(function() {
-	$('#uploadtemplate').on('click', function (e) {
-		e.preventDefault();
-		var form = $('#form-templateupload');
-		form.submit();
-		$('#modal-templateupload').modal('toggle');		
-	});
+    $('.datepicker').daterangepicker({ 
+    	singleDatePicker: true,
+        showDropdowns: true        
+    });  
+
 });
 
-
 $(function() {
-	var appTemplates = new Vue({
-		el: '#app-templates',
+	
+	$('.ui-pnotify').remove();
+	
+	$("#reviseFormModalForm").submit(function(e) {
+
+		var form = $("#reviseFormModalForm");
+	    var url = form.data('action');
+	    $('#reviseFormModal').modal('toggle');
+	    appSettings.setItemLoading();	    
+	    $.ajax({
+	           type: "POST",
+	           url: url,
+	           data: form.serialize(), // serializes the form's elements.
+	           success: function(data)
+	           {   	        	   
+	        	   $('.loading').hide();
+	        	   new PNotify({
+                       title: data.title,
+                       text: data.message,
+                       type: 'info',
+                       styling: 'bootstrap3'
+                   });
+	        	   appRevise.fetchData();	        	   
+	           },
+	           error: function(XMLHttpRequest, textStatus, errorThrown) {
+	        	   $('.loading').hide();
+	        	   new PNotify({
+                       title: textStatus,
+                       text: errorThrown,
+                       type: 'error',
+                       styling: 'bootstrap3'
+                   });	        	   
+	           },
+	         });  
+	    
+	    e.preventDefault(); // avoid to execute the actual submit of the form.
+	});
+	
+	var appRevise = new Vue({
+		el: '#app-revise',
 		data: {
 			items: [
 			],			
@@ -5344,7 +5365,7 @@ $(function() {
 			fetchData: function () {
 				var xhr = new XMLHttpRequest()
 				var self = this;
-				xhr.open('GET', '/activetemplates/');
+				xhr.open('GET', '/lastrevises/');
 				xhr.onload = function () {
 					self.items = JSON.parse(xhr.responseText);
 					var do_refresh = false;
@@ -5363,67 +5384,10 @@ $(function() {
 			},			
 			open: function (url) {
 				window.location.href = url;
-			},
-			refresh: function (id) {
-				var self = this;
-				var obj = self.items.filter(function (obj) {
-							return obj.id === id;
-						})[0];
-				self.setItemLoading(obj);
-				$.post(					
-					"/gettemplate/" + id,
-					{
-						csrfmiddlewaretoken: getCookie('csrftoken'),
-					},
-					function (data) {
-						if (data.status == true) {
-							self.fetchData();
-						}
-					}
-				)
-					.fail(function (response) {						
-						obj.status = response.responseText;						
-						obj.status_class = "danger";
-						obj.load_image = ""
-					});
-			},
+			},			
 		}
 	});
 	
-	
-	var appVoyages = new Vue({
-		el: '#app-orders',
-		data: {
-			items: [
-			],			
-		},
-		delimiters: ["<%", "%>"],
-
-		methods: {
-			open: function (url) {
-				window.location.href = url;
-			},
-			fetchData: function () {
-				var xhr = new XMLHttpRequest()
-				var self = this;
-				xhr.open('GET', '/getlastorders/');
-				xhr.onload = function () {
-					self.items = JSON.parse(xhr.responseText);	
-				}
-				xhr.send()
-			},
-		},
-	});
-	 
-	var appVoygeSettings = new Vue({
-		el: '#app-voyage-settings',		
-		methods: {
-			fetchData: function () {
-				appVoyages.fetchData();
-			},
-		},		
-	});
-
 	var appSettings = new Vue({
 		el: '#app-settings',
 		data: {
@@ -5433,97 +5397,28 @@ $(function() {
 
 		methods: {
 			fetchData: function () {
-				appTemplates.fetchData();
+				appRevise.fetchData();
 			},			
 			setItemLoading: function () {
 				 $(this.$el).find('.loading').fadeIn();				 
 				 this.error = "";
 				 $(this.$el).find('#error-message').fadeOut(); 
 			},
-			refresh: function (id) {
+			removeItemLoading: function () {
+				$(self.$el).find('.loading').hide(); 
+			},
+			refresh: function () {
 				var self = this;
 				self.setItemLoading();
-				$.post(					
-					"/gettemplate/" + id,
-					{
-						csrfmiddlewaretoken: getCookie('csrftoken'),
-					},
-					function (data) {
-						if (data.status == true) {
-							$(self.$el).find('.loading').hide();
-							location.reload();
-						}
-					}
-				)
-					.fail(function (response) {
-						$(self.$el).find('.loading').fadeOut();
-						self.error = response.responseText;						
-						$(self.$el).find('#error-message').fadeIn(); 
-					});
+				self.fetchData();				
+				$(self.$el).find('.loading').hide();
+				
 			},
 		},
 	});
 	
-	$('#loadinglist').on('click', function (e) {
-		e.preventDefault();		
-		getfile($(this));				
-	});
+	appRevise.fetchData();
 	
-	$('.mission-xlsx').on('click', function (e) {
-		e.preventDefault();		
-		getfile($(this));				
-	});
-	
-	function getfile(self){
-		$('#error-message').fadeOut();
-					
-		var url = self.data("url");
-		var saved = self.html();
-		
-		self.html("<div class='cssload-jumping'><span></span><span></span><span></span><span></span><span></span></div>");
-		
-		$.post(					
-				url,
-				{
-					csrfmiddlewaretoken: getCookie('csrftoken'),
-				},
-				function (data) {
-					self.html(saved);
-					if (data.status == true) {						
-						window.location.assign(data.url);						
-					}
-				}
-			)
-				.fail(function (response) {
-					self.html(saved);
-					appSettings.error = response.responseText;											
-					$('#error-message').fadeIn();					
-				});
-	}
-		
-	appTemplates.fetchData();
-	appVoyages.fetchData();
-		
 });
-
-$(document).ready(function () {
-
-    (function ($) {
-
-        $('#filter').keyup(function () {
-
-            var rex = new RegExp($(this).val(), 'i');
-            $('.searchable tr').hide();
-            $('.searchable tr').filter(function () {
-                return rex.test($(this).text());
-            }).show();
-
-        })
-
-    }(jQuery));
-
-});
-
-
 
 
