@@ -3,7 +3,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
-from nutep.views import (landing, ServiceView, get_revise, get_last_revises)
+from nutep.views import (landing, ServiceView, get_revise, get_last_revises,
+    get_tracking)
 from django.conf.urls.static import static
 
 admin.autodiscover()
@@ -25,6 +26,7 @@ urlpatterns += [
     url(r'^$', landing, name='landing'), 
     url(r'^services/$', ServiceView.as_view(), name='services'),
     url(r'^revise/$', get_revise, name='revise'),
+    url(r'^tracking/$', get_tracking, name='tracking'),
     url(r'^lastrevises/$', get_last_revises, name='lastrevises'),   
 ]
 

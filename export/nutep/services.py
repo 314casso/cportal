@@ -7,6 +7,7 @@ from nutep.models import Employee, File
 import base64
 from suds.cache import NoCache
 from suds.client import Client
+from django.utils.timezone import now
 
 
 class WSDLService(object):
@@ -44,7 +45,7 @@ class ReviseService(WSDLService):
             response = self._client.service.GetReport(user.profile.INN, start_date, end_date)
             if hasattr(response, 'Report') and response.Report:
                 file_data = response.Report[0].Data                
-                filename = u'%s.%s' %  (user.profile.user, 'xlsx')
+                filename = u'%s-%s.%s' %  (user.profile.user, 'revise', 'xlsx')
                 file_store = File()
                 file_store.content_object = user
                 file_store.title = filename
@@ -53,7 +54,25 @@ class ReviseService(WSDLService):
                 file_store.file.save(filename, ContentFile(base64.b64decode(file_data)))
                 return file_store                     
         return response 
+    
             
+class TrackingService(WSDLService):
+    def get_track(self, user):
+        if user and user.profile.ukt_guids:                                     
+            response = self._client.service.GetRailFreightTracking(user.profile.ukt_guids)
+            print response
+            if hasattr(response, 'report') and response.report:
+                file_data = response.report[0].data                
+                filename = u'%s-%s.%s' %  (user.profile.user, 'tracking' , 'xlsx')
+                file_store = File()
+                file_store.content_object = user
+                file_store.title = filename
+                file_store.type = File.TRACKING
+                file_store.note = u'%s' % (now().strftime('%d.%m.%Y'))                 
+                file_store.file.save(filename, ContentFile(base64.b64decode(file_data)))
+                return file_store                     
+        return response
+                
 
 class CRMService(object):
     def __init__(self):

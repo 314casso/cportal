@@ -5348,6 +5348,43 @@ $(function() {
 	    e.preventDefault(); // avoid to execute the actual submit of the form.
 	});
 	
+	
+	$("#trackingFormModalForm").submit(function(e) {
+
+		var form = $("#trackingFormModalForm");
+	    var url = form.data('action');
+	    $('#trackingFormModal').modal('toggle');
+	    appSettings.setItemLoading();	    
+	    $.ajax({
+	           type: "POST",
+	           url: url,
+	           data: form.serialize(), // serializes the form's elements.
+	           success: function(data)
+	           {   	        	   
+	        	   $('.loading').hide();
+	        	   new PNotify({
+                       title: data.title,
+                       text: data.message,
+                       type: 'info',
+                       styling: 'bootstrap3'
+                   });
+	        	   appRevise.fetchData();	        	   
+	           },
+	           error: function(XMLHttpRequest, textStatus, errorThrown) {
+	        	   $('.loading').hide();
+	        	   new PNotify({
+                       title: textStatus,
+                       text: errorThrown,
+                       type: 'error',
+                       styling: 'bootstrap3'
+                   });	        	   
+	           },
+	         });  
+	    
+	    e.preventDefault(); // avoid to execute the actual submit of the form.
+	});
+	
+	
 	var appRevise = new Vue({
 		el: '#app-revise',
 		data: {

@@ -41,9 +41,11 @@ def employee_path(instance, filename):
 
 class File(models.Model):    
     REVISE = 1    
+    TRACKING = 2
     
     TYPE_CHOICES = (
-        (REVISE, 'Revise'),
+        (REVISE, u'Взаиморасчеты'),
+        (TRACKING, u'Слежение'),
     )
     
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -60,6 +62,7 @@ class File(models.Model):
             'title': self.title,            
             'updated': self.date.strftime('%d.%m.%Y %H:%M'),
             'url': self.file.url,
+            'type': self.get_type_display(),
             'note': self.note,
             }
         return result

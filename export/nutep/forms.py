@@ -17,6 +17,12 @@ class ProfileCustomWidget(ModelSelect2Widget):
 
 
 class ReviseForm(Form):
+    action = 'revise'
+    form_id = 'reviseFormModal'
+    title = u'Запрос ведомости взаиморасчетов'
+    ok_title = u'Отправить'
+    cancel_title = u'Отмена'
+    
     profile = forms.ModelChoiceField(label=u"Плательщик", queryset=UserProfile.objects.all(),
                                       widget=ProfileCustomWidget(
                                           attrs={'style': 'width:100%', 'class': 'form-control', 'required': None}))
@@ -28,4 +34,21 @@ class ReviseForm(Form):
         super(ReviseForm, self).__init__(*args, **kwargs)        
         if user:            
             self.fields['profile'].widget.queryset = user.profile.payers.all()
+
+
+class TrackingForm(Form):
+    action = 'tracking'
+    form_id = 'trackingFormModal'
+    title = u'Запрос слежения по ЖД и морю'
+    ok_title = u'Отправить'
+    cancel_title = u'Отмена'
     
+    profile = forms.ModelChoiceField(label=u"Клиент", queryset=UserProfile.objects.all(),
+                                      widget=ProfileCustomWidget(
+                                          attrs={'style': 'width:100%', 'class': 'form-control', 'required': None}))
+        
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)        
+        super(TrackingForm, self).__init__(*args, **kwargs)        
+        if user:            
+            self.fields['profile'].widget.queryset = user.profile.payers.all()    

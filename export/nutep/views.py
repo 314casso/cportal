@@ -23,10 +23,11 @@ from django_rq.decorators import job
 from export.local_settings import WEB_SERVISES
 from nutep.models import BaseError, News, File
 import hashlib
-from nutep.services import CRMService, PortalService, DealService, ReviseService
+from nutep.services import CRMService, PortalService, DealService, ReviseService,\
+    TrackingService
 import requests
 import datetime
-from nutep.forms import ReviseForm
+from nutep.forms import ReviseForm, TrackingForm
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 
@@ -80,7 +81,8 @@ class BaseView(TemplateView):
         
         start_date = datetime.date.today().replace(day=1)
         revise_form = ReviseForm(user=self.request.user, initial={'start_date': start_date.strftime('%d.%m.%Y')})
-        
+        tracking_form = TrackingForm(user=self.request.user)
+                
         context.update({
             'title': force_unicode('Рускон Онлайн'), 
             'manager': manager,
@@ -88,6 +90,7 @@ class BaseView(TemplateView):
             'news': self.news(),
             'dealstats': dealstats,
             'revise_form': revise_form,
+            'tracking_form': tracking_form,
         })         
         return context
 
@@ -116,6 +119,23 @@ def get_revise(request):
             return HttpResponse(json.dumps({ 'status':status, 'message': u'Файл ведомости успешно получен', 'title': u'Загрузка' }), content_type="application/json")
         except Exception as e:
             return HttpResponse(force_text(e), status=400) 
+        
+
+@require_http_methods(["POST"])
+@login_required
+def get_tracking(request):
+    if request.method == 'POST':
+        form = TrackingForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data['profile'].user            
+        try:        
+            tracking_service = TrackingService(WEB_SERVISES['report'])                        
+            response = tracking_service.get_track(user)
+            status = True if response else False                       
+            return HttpResponse(json.dumps({ 'status':status, 'message': u'Файл слежения успешно получен', 'title': u'Загрузка' }), content_type="application/json")
+        except Exception as e:
+            return HttpResponse(force_text(e), status=400)
+        
 
 def landing(request):
     if request.user.is_authenticated():
