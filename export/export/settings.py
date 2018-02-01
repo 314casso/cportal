@@ -21,11 +21,12 @@ MANAGERS = ADMINS
 
 AUTH_PROFILE_MODULE = "nutep.UserProfile"
 
-from local_settings import * #@UnusedWildImport
-
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.4/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'cp.ruscon.global', '192.168.18.128']
+
+from local_settings import * #@UnusedWildImport
+
 INTERNAL_IPS = ['localhost', '127.0.0.1', ]
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
