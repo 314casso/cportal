@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from nutep.models import (BaseError, UserProfile, Team, CompanyManager,
-    Employee, News, InfoSource, File)
+    Employee, News, InfoSource, File, Company)
 from nutep.services import DealService
 from export.local_settings import WEB_SERVISES
 import json
@@ -32,13 +32,18 @@ class FileInline(GenericTabularInline):
     extra = 1
     
     
+class CompanyInline(admin.TabularInline):
+    model = Company.users.through  # @UndefinedVariable
+    extra = 1
+        
+    
 class TeamInline(admin.TabularInline):
     model = Team.users.through  # @UndefinedVariable
     extra = 1
 
 
 class UserProfileAdmin(UserAdmin):    
-    inlines = [UserProfileInline, TeamInline, ManagerInline, FileInline]
+    inlines = [UserProfileInline, CompanyInline, TeamInline, ManagerInline, FileInline]
     
     actions = ['get_deal_stats']
     
@@ -53,6 +58,10 @@ class UserProfileAdmin(UserAdmin):
 
 
 class TeamAdmin(admin.ModelAdmin):  
+    pass
+
+
+class CompanyAdmin(admin.ModelAdmin):  
     pass
 
 
@@ -75,3 +84,4 @@ admin.site.register(Employee, EmployeeAdmin)
 admin.site.register(News, NewsAdmin)
 admin.site.register(InfoSource, InfoSourceAdmin)
 admin.site.register(File, FileAdmin)
+admin.site.register(Company, CompanyAdmin)

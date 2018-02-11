@@ -5,6 +5,9 @@ from nutep.middleware import get_current_user
 from nutep.models import HistoryMeta, UserProfile, Employee
 from nutep.services import CRMService, PortalService
 
+from django.contrib.auth.signals import user_logged_in
+from nutep.tasks import update_user
+
 
 def prepare_history(sender, instance, created, **kwargs): 
     if not hasattr(instance, 'user'):
@@ -13,11 +16,8 @@ def prepare_history(sender, instance, created, **kwargs):
                                is_created=created, user=instance.user)
 
 
-def update_profile(sender, instance, *args, **kwargs):
-    if not instance.name:
-        instance.name = instance.user
-    if not instance.fullname:
-        instance.fullname = instance.name 
+def update_profile(sender, instance, *args, **kwargs):    
+    pass 
    
    
 def update_employee(sender, instance, *args, **kwargs):
@@ -42,6 +42,11 @@ def update_teams(sender, instance, created, **kwargs):
             instance.teams.add(team)
 
 
+def do_stuff(sender, user, request, **kwargs):        
+    update_user.delay(user)  # @UndefinedVariable
+    
+
 def connect_signals():
+    user_logged_in.connect(do_stuff)
     pre_save.connect(update_profile, sender=UserProfile)
     pre_save.connect(update_employee, sender=Employee)

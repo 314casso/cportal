@@ -82,6 +82,25 @@ class Team(models.Model):
         ordering = ('name', )        
 
 
+class Company(models.Model):
+    crm_guids = ArrayField(models.CharField(max_length=36), blank=True, null=True)
+    ukt_guids = ArrayField(models.CharField(max_length=36), blank=True, null=True)
+    name = models.CharField('Наименование', max_length=150, db_index=True)
+    users = models.ManyToManyField(User, blank=True, related_name="companies")
+    details = JSONField(blank=True, null=True,)
+    INN = models.CharField(_('INN'), max_length=14, blank=True, null=True,)   
+    KPP = models.CharField(_('KPP'), max_length=10, blank=True, null=True,)
+    payers = models.ManyToManyField('self', blank=True,)
+    logo = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)
+    
+    def __unicode__(self):
+        return u'{0}'.format(self.name) 
+    class Meta:
+        verbose_name = force_unicode('компания')
+        verbose_name_plural = force_unicode('компании')
+        ordering = ('name', )
+
+
 class BaseModelManager(models.Manager):    
     def get_queryset(self):        
         return super(BaseModelManager, self).get_queryset().filter(deleted=False)
@@ -166,23 +185,18 @@ class BaseError(models.Model):
         ordering = ('id', )
 
 
-class UserProfile(models.Model):    
-    crm_guids = ArrayField(models.CharField(max_length=36), blank=True, null=True)
-    ukt_guids = ArrayField(models.CharField(max_length=36), blank=True, null=True)
-    name = models.CharField(_('company name'), max_length=100, blank=True)
-    fullname = models.CharField(_('company full name'), max_length=150, blank=True)
+class UserProfile(models.Model):
+    middle_name = models.CharField(_('middle name'), max_length=30, blank=True)  
+    position = models.CharField(_('position'), max_length=150, blank=True)
     user = models.OneToOneField(User, unique=True, related_name='profile')
+    valid_till = models.DateField(blank=True, null=True)
     image = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)
-    details = JSONField(blank=True, null=True,)
-    INN = models.CharField(_('INN'), max_length=14, blank=True, null=True,)   
-    KPP = models.CharField(_('KPP'), max_length=10, blank=True, null=True,)
-    payers = models.ManyToManyField('self', blank=True,)
-    
+        
     def get_fullname(self):
-        return u'%s' % (self.fullname)    
+        return u'%s %s %s' % (self.user.last_name, self.user.first_name, self.middle_name)    
     
     def __unicode__(self):
-        return u'{0}'.format(self.fullname)
+        return self.get_fullname()
 
 
 class Employee(models.Model):

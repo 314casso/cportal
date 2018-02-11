@@ -30,6 +30,8 @@ import datetime
 from nutep.forms import ReviseForm, TrackingForm
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
+from rest_framework import viewsets
+from nutep.serializers import UserSerializer
 
 
 logger = logging.getLogger('django.request')
@@ -157,5 +159,11 @@ class ServiceView(BaseView):
         return context
 
 
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
 
  

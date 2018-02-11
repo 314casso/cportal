@@ -135,6 +135,16 @@ TEMPLATES = [
     },
 ]
 
+REST_FRAMEWORK = { 
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissions'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -147,6 +157,7 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'django_select2',
     'django_rq',
+    'rest_framework',
     'debug_toolbar',
 )
 
