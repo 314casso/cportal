@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 from nutep.views import (landing, ServiceView, get_revise, get_last_revises,
     get_tracking)
 from django.conf.urls.static import static
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 admin.autodiscover()
 
@@ -38,6 +39,10 @@ urlpatterns += [
     url(r'^django-rq/', include('django_rq.urls')),
 ]
 
+urlpatterns += [
+    url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^api-token-refresh/', refresh_jwt_token),
+]
 
 from rest_framework import routers
 from nutep import views
