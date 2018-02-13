@@ -13,7 +13,7 @@ class ProfileCustomWidget(ModelSelect2Widget):
     ]
 
     def label_from_instance(self, obj):
-        return force_text(u'%s (%s)' % (obj.name, obj.user))
+        return force_text(u'%s' % (obj.name,))
 
 
 class ReviseForm(Form):
@@ -33,7 +33,7 @@ class ReviseForm(Form):
         user = kwargs.pop('user', None)        
         super(ReviseForm, self).__init__(*args, **kwargs)        
         if user:            
-            self.fields['profile'].widget.queryset = user.profile.payers.all()
+            self.fields['profile'].widget.queryset = user.companies.all()
 
 
 class TrackingForm(Form):
@@ -51,4 +51,5 @@ class TrackingForm(Form):
         user = kwargs.pop('user', None)        
         super(TrackingForm, self).__init__(*args, **kwargs)        
         if user:            
-            self.fields['profile'].widget.queryset = user.profile.payers.all()    
+            self.fields['profile'].widget.queryset = user.companies.all()
+                

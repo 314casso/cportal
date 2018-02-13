@@ -7,6 +7,8 @@ from nutep.services import CRMService, PortalService
 
 from django.contrib.auth.signals import user_logged_in
 from nutep.tasks import update_user
+from django.core.exceptions import PermissionDenied
+from nutep.utils import is_user_valid
 
 
 def prepare_history(sender, instance, created, **kwargs): 
@@ -42,11 +44,11 @@ def update_teams(sender, instance, created, **kwargs):
             instance.teams.add(team)
 
 
-def do_stuff(sender, user, request, **kwargs):        
+def do_user_update(sender, user, request, **kwargs):            
     update_user.delay(user)  # @UndefinedVariable
     
 
 def connect_signals():
-    user_logged_in.connect(do_stuff)
+    user_logged_in.connect(do_user_update)
     pre_save.connect(update_profile, sender=UserProfile)
     pre_save.connect(update_employee, sender=Employee)

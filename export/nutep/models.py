@@ -83,14 +83,13 @@ class Team(models.Model):
 
 
 class Company(models.Model):
-    crm_guids = ArrayField(models.CharField(max_length=36), blank=True, null=True)
-    ukt_guids = ArrayField(models.CharField(max_length=36), blank=True, null=True)
+    crm_guid = models.CharField(max_length=36, blank=True, null=True)
+    ukt_guid = models.CharField(max_length=36, blank=True, null=True)
     name = models.CharField('Наименование', max_length=150, db_index=True)
-    users = models.ManyToManyField(User, blank=True, related_name="companies")
+    members = models.ManyToManyField(User, blank=True, related_name="companies", through='Membership')
     details = JSONField(blank=True, null=True,)
     INN = models.CharField(_('INN'), max_length=14, blank=True, null=True,)   
-    KPP = models.CharField(_('KPP'), max_length=10, blank=True, null=True,)
-    payers = models.ManyToManyField('self', blank=True,)
+    KPP = models.CharField(_('KPP'), max_length=10, blank=True, null=True,)    
     logo = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)
     
     def __unicode__(self):
@@ -99,6 +98,12 @@ class Company(models.Model):
         verbose_name = force_unicode('компания')
         verbose_name_plural = force_unicode('компании')
         ordering = ('name', )
+
+
+class Membership(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="members")
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)    
+    is_general = models.BooleanField()
 
 
 class BaseModelManager(models.Manager):    
@@ -191,7 +196,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, unique=True, related_name='profile')
     valid_till = models.DateField(blank=True, null=True)
     image = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)
-        
+           
     def get_fullname(self):
         return u'%s %s %s' % (self.user.last_name, self.user.first_name, self.middle_name)    
     

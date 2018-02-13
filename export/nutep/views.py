@@ -59,15 +59,17 @@ class BaseView(TemplateView):
         return News.objects.all()[:limit]
     
     def get_dealstats(self, dateformat="%d.%m.%Y %H:%M:%S"):
-        if self.request.user.profile:
-            deal_stats = self.request.user.profile.details.get('DealStats')
-            if deal_stats:
-                result = {}
-                result['dealdate'] = datetime.datetime.strptime(deal_stats.get('FirstDeal'), dateformat)
-                result['totaldeals'] = deal_stats.get('TotalDeals')
-                result['lastmonth'] = deal_stats.get('LastMonth')
-                result['days_together'] = (datetime.datetime.now() - result['dealdate']).days
-                return result
+        company = self.request.user.companies.filter(membership__is_general=True).first()
+        if not company:
+            return
+        deal_stats = company.details.get('DealStats')
+        if deal_stats:
+            result = {}
+            result['dealdate'] = datetime.datetime.strptime(deal_stats.get('FirstDeal'), dateformat)
+            result['totaldeals'] = deal_stats.get('TotalDeals')
+            result['lastmonth'] = deal_stats.get('LastMonth')
+            result['days_together'] = (datetime.datetime.now() - result['dealdate']).days
+            return result
 
     def get_context_data(self, **kwargs):
         context = super(BaseView, self).get_context_data(**kwargs)

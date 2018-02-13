@@ -2,6 +2,7 @@ from urlparse import urlparse
 
 from django.http import QueryDict
 from django.utils.encoding import iri_to_uri
+from django.utils.timezone import now
 
 
 def next_url(full_path, keys_to_delete=None):
@@ -23,3 +24,13 @@ def next_url(full_path, keys_to_delete=None):
     params = '?%s' % next_query_dict.urlencode() if next_query_dict else ''
     q['next'] = '%s%s' % (nexturl, params)
     return q.urlencode()
+
+
+def is_user_valid(user):
+    if user.is_superuser:
+        return False
+    if not user.profile:
+        return False
+    if user.profile.valid_till < now():
+        return False
+    return True

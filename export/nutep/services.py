@@ -29,13 +29,10 @@ class WSDLService(object):
         self._client = Client(self.url, username=self.username, password=self.password, headers=authenticationHeader, cache=NoCache(), timeout=500)  
 
 
-class DealService(WSDLService):
-    def get_deal_stats(self, user):
-        guids = user.profile.ukt_guids 
-        for payer in user.profile.payers.all():
-            guids.extend(payer.ukt_guids)
-                                     
-        response = self._client.service.GetDealStats(','.join(set(guids)))         
+class DealService(WSDLService):    
+    def get_deal_stats(self, user):        
+        guids = user.companies.all().values_list('ukt_guid', flat=True)                    
+        response = self._client.service.GetDealStats(','.join(guids))         
         return response      
 
 

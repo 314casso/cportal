@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from nutep.models import (BaseError, UserProfile, Team, CompanyManager,
-    Employee, News, InfoSource, File, Company)
+    Employee, News, InfoSource, File, Company, Membership)
 from nutep.services import DealService
 from export.local_settings import WEB_SERVISES
 import json
@@ -33,7 +33,7 @@ class FileInline(GenericTabularInline):
     
     
 class CompanyInline(admin.TabularInline):
-    model = Company.users.through  # @UndefinedVariable
+    model = Membership  # @UndefinedVariable
     extra = 1
         
     
