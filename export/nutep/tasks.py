@@ -6,6 +6,7 @@ import json
 
 @job('default')
 def update_user(user):
+    print "DO UPDATE"
     company = user.companies.filter(membership__is_general=True).first()
     if not company:
         return

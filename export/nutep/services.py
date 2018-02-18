@@ -5,9 +5,11 @@ from export.local_settings import WEB_SERVISES
 from nutep.odata import CRM, Portal
 from nutep.models import Employee, File
 import base64
-from suds.cache import NoCache
-from suds.client import Client
 from django.utils.timezone import now
+from requests import Session
+from requests.auth import HTTPBasicAuth  # or HTTPDigestAuth, or OAuth1, etc.
+from zeep import Client
+from zeep.transports import Transport
 
 
 class WSDLService(object):
@@ -20,13 +22,10 @@ class WSDLService(object):
     def set_client(self, settings):
         for key in settings.iterkeys():             
             setattr(self, key, settings.get(key))   
-        base64string = base64.encodestring(
-            '%s:%s' % (self.username, self.password)).replace('\n', '')
-        authenticationHeader = {
-            "SOAPAction" : "ActionName",
-            "Authorization" : "Basic %s" % base64string
-        } 
-        self._client = Client(self.url, username=self.username, password=self.password, headers=authenticationHeader, cache=NoCache(), timeout=500)  
+        
+        session = Session()
+        session.auth = HTTPBasicAuth(self.username, self.password)         
+        self._client = Client(self.url, transport=Transport(session=session, timeout=500))  
 
 
 class DealService(WSDLService):    
