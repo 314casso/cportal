@@ -7,8 +7,6 @@ from nutep.services import CRMService, PortalService
 
 from django.contrib.auth.signals import user_logged_in
 from nutep.tasks import update_user
-from django.core.exceptions import PermissionDenied
-from nutep.utils import is_user_valid
 
 
 def prepare_history(sender, instance, created, **kwargs): 
