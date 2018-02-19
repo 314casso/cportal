@@ -5,7 +5,6 @@ from __future__ import division
 import json
 import logging
 
-import suds
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
@@ -21,7 +20,7 @@ from django.views.generic.edit import DeleteView
 from django_rq.decorators import job
 
 from export.local_settings import WEB_SERVISES
-from nutep.models import BaseError, News, File
+from nutep.models import BaseError, News, File, DateQueryEvent
 import hashlib
 from nutep.services import CRMService, PortalService, DealService, ReviseService,\
     TrackingService
@@ -31,7 +30,7 @@ from nutep.forms import ReviseForm, TrackingForm
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from rest_framework import viewsets
-from nutep.serializers import UserSerializer
+from nutep.serializers import UserSerializer, DateQueryEventSerializer
 
 
 logger = logging.getLogger('django.request')
@@ -134,7 +133,7 @@ def get_tracking(request):
             user = form.cleaned_data['profile'].user            
         try:        
             tracking_service = TrackingService(WEB_SERVISES['report'])                        
-            response = tracking_service.get_track(user)
+            response = tracking_service.get_track(request.user)
             status = True if response else False                       
             return HttpResponse(json.dumps({ 'status':status, 'message': u'Файл слежения успешно получен', 'title': u'Загрузка' }), content_type="application/json")
         except Exception as e:
@@ -168,4 +167,11 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
 
+
+class TrackingViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = DateQueryEvent.objects.filter(type=DateQueryEvent.TRACKING)[1:]
+    serializer_class = DateQueryEventSerializer
  

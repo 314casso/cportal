@@ -5,7 +5,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
 from nutep.models import (BaseError, UserProfile, Team, CompanyManager,
-    Employee, News, InfoSource, File, Company, Membership)
+    Employee, News, InfoSource, File, Company, Membership, DateQueryEvent,
+    Container, RailFreightTracking)
 from nutep.services import DealService
 from export.local_settings import WEB_SERVISES
 import json
@@ -77,6 +78,14 @@ class InfoSourceAdmin(admin.ModelAdmin):
     pass
 
 
+class DateQueryEventAdmin(admin.ModelAdmin):
+    pass
+
+
+class ContainerAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(BaseError)
 admin.site.register(Team, TeamAdmin)
@@ -85,3 +94,7 @@ admin.site.register(News, NewsAdmin)
 admin.site.register(InfoSource, InfoSourceAdmin)
 admin.site.register(File, FileAdmin)
 admin.site.register(Company, CompanyAdmin)
+admin.site.register(DateQueryEvent, DateQueryEventAdmin)
+admin.site.register(Container, ContainerAdmin)
+admin.site.register(RailFreightTracking)
+
