@@ -40,6 +40,13 @@ def employee_path(instance, filename):
     return base_path(root, filename)
 
 
+class PrivateManager(models.Manager):    
+    def for_user(self, user):
+        if not user:
+            return super(PrivateManager, self).get_queryset().none()
+        return super(PrivateManager, self).get_queryset().filter(user=user)
+    
+
 class DateQueryEvent(models.Model):
     UNKNOWN = 300    
     PENDING = 100
@@ -68,6 +75,9 @@ class DateQueryEvent(models.Model):
     files = GenericRelation('File')
     status = models.IntegerField(choices=STATUS_CHOICES, default=UNKNOWN)
     note = models.CharField(blank=True, null=True, max_length=255)
+    errors = GenericRelation('BaseError')
+    company = models.ForeignKey('Company', blank=True, null=True)
+    objects = PrivateManager()
     
     def __unicode__(self):
         return u'{0} {1} {2}'.format(self.pk, self.type, self.status)
@@ -144,16 +154,6 @@ class File(models.Model):
     title = models.CharField(blank=True, null=True, max_length=255)    
     file = models.FileField(upload_to=attachment_path, blank=True, null=True,)
     
-#     def as_dict(self):
-#         result = {            
-#             'title': self.title,            
-#             'updated': self.date.strftime('%d.%m.%Y %H:%M'),
-#             'url': self.file.url,
-#             'type': self.get_type_display(),
-#             'note': self.note,
-#             }
-#         return result
-    
     def __unicode__(self):
         return force_unicode(self.title) 
 
@@ -190,7 +190,8 @@ class Company(models.Model):
 class Membership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="members")
     company = models.ForeignKey(Company, on_delete=models.CASCADE)    
-    is_general = models.BooleanField()
+    is_general = models.BooleanField(default=False)
+    is_payer = models.BooleanField(default=False)
 
 
 class BaseModelManager(models.Manager):    

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from nutep.models import DateQueryEvent, File, UserProfile, RailFreightTracking,\
-    Container, Platform, RailData, RailTracking, FreightData, FreightTracking
+    Container, Platform, RailData, RailTracking, FreightData, FreightTracking,\
+    Employee, News
 
 
 class ProfileSerializer(serializers.HyperlinkedModelSerializer):
@@ -72,7 +73,7 @@ class TrackSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('container', 'platform', 'raildata', 'railtracking', 'freightdata', 'freighttracking')
                
 
-class DateQueryEventSerializer(serializers.HyperlinkedModelSerializer):        
+class DateQueryTrackingSerializer(serializers.HyperlinkedModelSerializer):        
     files = FileSerializer(many=True)
     user = UserSerializer()  
     tracks = TrackSerializer(many=True)
@@ -87,4 +88,39 @@ class DateQueryEventSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'date', 'user', 'type', 'files', 'status', 'note', 'tracks')
 
 
+class DateQueryReviseSerializer(serializers.HyperlinkedModelSerializer):        
+    files = FileSerializer(many=True)
+    user = UserSerializer() 
+    type = serializers.SerializerMethodField()
+    
+    def get_type(self, obj):
+        return obj.get_type_display()  
+      
+    class Meta:
+        depth = 1
+        model = DateQueryEvent
+        fields = ('id', 'date', 'user', 'type', 'files', 'status', 'note')
 
+
+class EventStatusSerializer(serializers.HyperlinkedModelSerializer):       
+    user = UserSerializer()  
+    class Meta:
+        depth = 1
+        model = DateQueryEvent
+        fields = ('id', 'date', 'type', 'status', 'user')
+     
+
+class EmployeesSerializer(serializers.ModelSerializer):
+    users = UserSerializer(many=True)
+    class Meta:
+        depth = 1
+        model = Employee
+        fields = ('domainname','crm_id','portal_id','first_name','last_name','middle_name','job_title','image','head','mobile','phone','email','skype','users')
+                
+
+class NewsSerializer(serializers.ModelSerializer):    
+    class Meta:
+        depth = 1
+        model = News
+        fields = '__all__'
+        

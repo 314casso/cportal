@@ -78,8 +78,13 @@ class InfoSourceAdmin(admin.ModelAdmin):
     pass
 
 
+class ErrorInline(GenericTabularInline):
+    model = BaseError  # @UndefinedVariable
+    extra = 0
+
+
 class DateQueryEventAdmin(admin.ModelAdmin):
-    pass
+    inlines = [ErrorInline, FileInline]
 
 
 class ContainerAdmin(admin.ModelAdmin):

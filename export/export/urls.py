@@ -1,10 +1,8 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 
-from nutep.views import (landing, ServiceView, get_revise, get_last_revises,
-    get_tracking)
+from nutep.views import (RailFreightTrackingAPIView, ReviseAPIView)
 from django.conf.urls.static import static
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
@@ -18,17 +16,16 @@ urlpatterns = [
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    url(r'^accounts/login/$', auth_views.login, name='login'),
-    url(r'^accounts/logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
+#     url(r'^accounts/login/$', auth_views.login, name='login'),
+#     url(r'^accounts/logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
     url(r'^admin/', include(admin.site.urls)),
 ]
 
 urlpatterns += [ 
-    url(r'^$', landing, name='landing'), 
-    url(r'^services/$', ServiceView.as_view(), name='services'),
-    url(r'^revise/$', get_revise, name='revise'),
-    url(r'^tracking/$', get_tracking, name='tracking'),
-    url(r'^lastrevises/$', get_last_revises, name='lastrevises'),   
+#     url(r'^$', landing, name='landing'), 
+#     url(r'^services/$', ServiceView.as_view(), name='services'),
+    url(r'^pingtracking/$', RailFreightTrackingAPIView.as_view(), name='pingtracking'),
+    url(r'^pingrevise/$', ReviseAPIView.as_view(), name='pingrevise'),   
 ]
 
 urlpatterns += [
@@ -49,7 +46,13 @@ from nutep import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
-router.register(r'events', views.TrackingViewSet)
+router.register(r'events', views.EventViewSet, 'events')
+router.register(r'trackevents', views.TrackingViewSet, 'trackevents')
+router.register(r'reviseevents', views.ReviseViewSet, 'reviseevents')
+router.register(r'employees', views.EmployeesViewSet, 'employees')
+router.register(r'dealstats', views.DealStats, 'dealstats')
+router.register(r'jobstatus', views.JobStatus, 'jobstatus')
+router.register(r'news', views.NewsViewSet, 'news')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -60,12 +63,6 @@ urlpatterns += [
 
 
 if settings.DEBUG:
-#     urlpatterns = [('',
-#         url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-#         {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-#         url(r'', include('django.contrib.staticfiles.urls')),
-#     )] + urlpatterns
-
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     

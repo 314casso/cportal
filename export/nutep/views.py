@@ -2,35 +2,33 @@
 
 from __future__ import division
 
+import datetime
 import json
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.core.files.base import ContentFile
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.contrib.auth.models import User
+
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_text, force_unicode
-from django.views.decorators.http import require_http_methods
+from django.utils.encoding import force_unicode
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import DeleteView
-from django_rq.decorators import job
+import django_rq
 
-from export.local_settings import WEB_SERVISES
-from nutep.models import BaseError, News, File, DateQueryEvent
-import hashlib
-from nutep.services import CRMService, PortalService, DealService, ReviseService,\
-    TrackingService
-import requests
-import datetime
+from rest_framework import viewsets, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from nutep.forms import ReviseForm, TrackingForm
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.auth.models import User
-from rest_framework import viewsets
-from nutep.serializers import UserSerializer, DateQueryEventSerializer
+from nutep.models import News, DateQueryEvent
+from nutep.serializers import UserSerializer, DateQueryTrackingSerializer, \
+    EventStatusSerializer, DateQueryReviseSerializer, EmployeesSerializer,\
+    NewsSerializer
+from nutep.tasks import tracking_task, revise_task
+from django.utils.timezone import now
+from datetime import timedelta
 
 
 logger = logging.getLogger('django.request')
@@ -47,6 +45,7 @@ class DeleteMixin(SingleObjectMixin):
         self.object.deleted = True
         self.object.save()
         return HttpResponse(json.dumps({'pk': self.object.id}), content_type="application/json")
+
 
 class BaseView(TemplateView):
     @method_decorator(login_required)
@@ -98,48 +97,6 @@ class BaseView(TemplateView):
         return context
 
 
-@login_required
-def get_last_revises(request):    
-    ct = ContentType.objects.get_for_model(request.user)
-    values = set(User.objects.filter(profile__payers__in=request.user.profile.payers.all()).values_list('id', flat=True)) 
-    revises = File.objects.filter(content_type__pk=ct.id, object_id__in=values).order_by("-date")[:5]   
-    return JsonResponse([obj.as_dict() for obj in revises], safe=False)    
-
-
-@require_http_methods(["POST"])
-@login_required
-def get_revise(request):
-    if request.method == 'POST':
-        form = ReviseForm(request.POST)
-        if form.is_valid():
-            user = form.cleaned_data['profile'].user
-            start_date = form.cleaned_data['start_date']
-            end_date = form.cleaned_data['end_date']
-        try:        
-            revise_service = ReviseService(WEB_SERVISES['erp'])                        
-            response = revise_service.get_revise(user, start_date, end_date)
-            status = True if response else False                       
-            return HttpResponse(json.dumps({ 'status':status, 'message': u'Файл ведомости успешно получен', 'title': u'Загрузка' }), content_type="application/json")
-        except Exception as e:
-            return HttpResponse(force_text(e), status=400) 
-        
-
-@require_http_methods(["POST"])
-@login_required
-def get_tracking(request):
-    if request.method == 'POST':
-        form = TrackingForm(request.POST)
-        if form.is_valid():
-            user = form.cleaned_data['profile'].user            
-        try:        
-            tracking_service = TrackingService(WEB_SERVISES['report'])                        
-            response = tracking_service.get_track(request.user)
-            status = True if response else False                       
-            return HttpResponse(json.dumps({ 'status':status, 'message': u'Файл слежения успешно получен', 'title': u'Загрузка' }), content_type="application/json")
-        except Exception as e:
-            return HttpResponse(force_text(e), status=400)
-        
-
 def landing(request):
     if request.user.is_authenticated():
         return redirect('services')
@@ -161,17 +118,74 @@ class ServiceView(BaseView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
+    permission_classes = (permissions.IsAdminUser,)
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
 
 
-class TrackingViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = DateQueryEvent.objects.filter(type=DateQueryEvent.TRACKING)[1:]
-    serializer_class = DateQueryEventSerializer
+class TrackingViewSet(viewsets.ModelViewSet):     
+    serializer_class = DateQueryTrackingSerializer
+    def get_queryset(self):
+        return DateQueryEvent.objects.for_user(self.request.user).filter(type=DateQueryEvent.TRACKING).order_by('-date')[:1]
  
+ 
+class ReviseViewSet(viewsets.ModelViewSet):
+    serializer_class = DateQueryReviseSerializer
+    def get_queryset(self):
+        return DateQueryEvent.objects.for_user(self.request.user).filter(type=DateQueryEvent.REVISE).order_by('-date')[:1]
+ 
+ 
+class RailFreightTrackingAPIView(APIView):
+    def post(self, request):
+        job = tracking_task.delay(request.user)  # @UndefinedVariable        
+        return Response({ 'job': job.id })
+    
+    
+class ReviseAPIView(APIView):
+    def post(self, request):
+        today = now()
+        start_date = today - timedelta(days=360) 
+        end_date = today
+        job = revise_task.delay(request.user, start_date, end_date)  # @UndefinedVariable        
+        return Response({ 'job': job.id })    
+
+
+class JobStatus(viewsets.ViewSet):
+    def retrieve(self, request, pk):        
+        print request.POST       
+        queue = django_rq.get_queue('default')
+        job = queue.fetch_job(pk)
+        status = job.status if job else None
+        return Response({ 'job': status })
+    
+
+class DealStats(viewsets.ViewSet):
+    def list(self, request):       
+        company = request.user.companies.filter(membership__is_general=True).first()
+        if not company:
+            return Response({})
+        deal_stats = company.details.get('DealStats')
+        if deal_stats:
+            return Response({ 'deal_stats': deal_stats })
+        return Response({})    
+    
+
+class EventViewSet(viewsets.ModelViewSet):    
+    serializer_class = EventStatusSerializer
+    def get_queryset(self):
+        DateQueryEvent.objects.for_user(self.request.user).filter(status__in=(DateQueryEvent.ERROR, DateQueryEvent.PENDING)).order_by('-date')        
+    
+
+class EmployeesViewSet(viewsets.ModelViewSet):
+    serializer_class = EmployeesSerializer
+    def get_queryset(self):
+        return self.request.user.managers.all()    
+
+
+class NewsViewSet(viewsets.ModelViewSet):
+    limit = 5
+    serializer_class = NewsSerializer
+    def get_queryset(self):        
+        return News.objects.all()[:self.limit]                          
+                          
+                          

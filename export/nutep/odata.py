@@ -74,17 +74,4 @@ class Portal(BaseSession):
             return dto
 
 
-# def add_lead(name, email, message):
-#     
-#     url =  
-#     values = {
-#             'subject':  email,
-#             'emailaddress1': email,
-#             'lastname': name,
-#             'description': u'%s' % message,
-#             'leadsourcecode': 100000001,
-#             'ownerid@odata.bind': "/teams(8d10cfd9-b06e-e611-80c8-00505693217d)",
-#               }
-#     r = session.post(url, json=values)
-#     return r
 

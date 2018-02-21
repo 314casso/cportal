@@ -7,4 +7,7 @@ encoding//export/nutep/odata.py=utf-8
 encoding//export/nutep/services.py=utf-8
 encoding//export/nutep/views.py=utf-8
 encoding//lib/python2.7/site-packages/django/db/models/fields/__init__.py=utf-8
+encoding//lib/python2.7/site-packages/rq/decorators.py=utf-8
+encoding//lib/python2.7/site-packages/rq/job.py=utf-8
+encoding//lib/python2.7/site-packages/rq/queue.py=utf-8
 encoding//local/export/nutep/views.py=utf-8
