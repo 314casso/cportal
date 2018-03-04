@@ -1,0 +1,25 @@
+.all-wrap {
+    height: -webkit-calc(100vh - 118px);
+    height: -moz-calc(100vh - 118px);
+    height: calc(100vh - 118px);
+}
+
+.mat-drawer {
+    background-color: #EDEDED;
+    opacity: 54%;
+}
+
+mat-sidenav {
+    overflow-x: hidden;
+}
+  
+.page-wrap {
+    display: flex;
+    flex-direction: column;
+}
+  
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}

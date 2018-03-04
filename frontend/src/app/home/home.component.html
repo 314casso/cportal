@@ -1,0 +1,56 @@
+<div class="content-wrapper">
+  <mat-card class="manager" *ngIf="employee">
+    <div class="mat-title">{{employee.job_title}}</div>
+    <mat-divider [inset]="true"></mat-divider>
+    <div>
+        <img class="avatar" [src]="employee.image">
+        <div class="mat-title firstname">{{employee.first_name}}</div>
+        <div class="mat-subheading-1">{{employee.last_name}}</div>
+        <mat-divider [inset]="true"></mat-divider>
+        <div class="phone mat-subheading-1">
+            <mat-icon mat-list-icon>phone</mat-icon>
+            {{employee.mobile}}
+            <!-- <img src="/assets/skype.svg">
+            <img src="/assets/email.svg"> -->
+        </div>
+        <mat-divider [inset]="true"></mat-divider>
+        <div class="estimate">
+          <button mat-raised-button color="primary">Оценить</button>
+        </div>
+    </div>
+  </mat-card>
+  <mat-card class="manager" *ngIf="head">
+    <div class="mat-title">{{head.job_title}}</div>
+    <mat-divider [inset]="true"></mat-divider>
+    <div>
+        <img class="avatar" [src]="head.image">
+        <div class="mat-title firstname">{{head.first_name}}</div>
+        <div class="mat-subheading-1">{{head.last_name}}</div>
+        <mat-divider [inset]="true"></mat-divider>
+        <div class="phone mat-subheading-1">
+            <mat-icon mat-list-icon>phone</mat-icon>
+            {{head.mobile}}
+            <!-- <img src="/assets/skype.svg">
+            <img src="/assets/email.svg"> -->
+        </div>
+        <mat-divider [inset]="true"></mat-divider>
+        <div class="estimate">
+          <button mat-raised-button color="primary">Оценить</button>
+        </div>
+    </div>
+  </mat-card>
+  <mat-card class="news-container">
+    <div class="mat-title">Новости группы</div>
+    <mat-divider [inset]="true"></mat-divider>
+    <div class="news" *ngFor="let item of news">
+      <div class="date">
+        <div class="month">{{item.date | date:'LLL':'':'ru' | titlecase | slice:0:3}}</div>
+        <div class="day">{{item.date | date:'d'}}</div>
+      </div>
+      <div class="content">
+        <a class="mat-body-2" matLine [href]="item.url">{{item.title}}</a>
+        <div class="mat-caption" matLine>{{item.summary}}</div>
+      </div>
+    </div>
+  </mat-card>
+</div>

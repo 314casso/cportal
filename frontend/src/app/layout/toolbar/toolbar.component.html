@@ -1,0 +1,11 @@
+<mat-toolbar color="primary" *ngIf="isLoggedIn$ | async as isLoggedIn">
+    <button type="button" mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <a class="logo" [routerLink]="['/home']">
+        <img class="logo" src="/assets/ruscon-logo.png">
+    </a>
+    <h1 class="mat-display-1 title">Личный кабинет</h1>
+    <span class="fill-remaining-space"></span>
+    <button mat-button (click)="onLogout()" *ngIf="isLoggedIn">Выйти</button>
+</mat-toolbar>

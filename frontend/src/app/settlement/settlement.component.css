@@ -1,0 +1,10 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    margin: 5px 10px 10px;
+}
+  
+.mat-table {
+    overflow: auto;
+}

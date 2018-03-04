@@ -1,0 +1,16 @@
+<header role="banner">
+  <app-toolbar></app-toolbar>
+</header>
+<mat-sidenav-container class="all-wrap" autosize>
+  <mat-sidenav #sidenav mode="side" opened="true">
+    <app-sidenav></app-sidenav>
+  </mat-sidenav>
+  <div class="page-wrap">
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</mat-sidenav-container>
+<footer>
+  <app-footer></app-footer>
+</footer>

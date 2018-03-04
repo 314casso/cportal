@@ -1,0 +1,21 @@
+<mat-nav-list>
+    <div [ngClass]="{ 'collapsed' : !(isExpanded$ | async) }" *ngFor='let item of menuItems; last as last'>
+        <a mat-list-item (click)="sidenav.toggle()">
+            <mat-icon mat-list-icon>{{ item.icon }}</mat-icon>
+            <span mat-line>{{ item.text }}</span>
+        </a>
+        <div *ngIf="isExpanded$ | async">
+            <ul *ngIf="item.submenu">
+                <li *ngFor='let subitem of item.submenu'>
+                    <a *ngIf="subitem.link" class="submenu" mat-list-item [routerLink]="[subitem.link]" title="{{subitem.text}}">
+                        <span mat-line *ngIf="isExpanded$ | async">{{ subitem.text }}</span>
+                    </a>
+                    <a *ngIf="subitem.action" class="submenu" mat-list-item [href]="subitem.action" title="{{subitem.text}}">
+                        <span mat-line *ngIf="isExpanded$ | async">{{ subitem.text }}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <mat-divider inset *ngIf="!last"></mat-divider>
+    </div>
+</mat-nav-list>
