@@ -1,0 +1,23 @@
+<div class="wrapper">
+  <div class="signin-content">
+    <mat-card>
+        <div class="mat-headline title" color="primary">
+            <img class="logo" src="/assets/ruscon-logo.png">
+            Авторизация
+          </div>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <mat-input-container class="full-width-input">
+            <input matInput placeholder="Логин" formControlName="userName" required>
+            <mat-error *ngIf="isFieldInvalid('userName')">Пожалуйста, введите свой логин</mat-error>
+          </mat-input-container>
+          <mat-input-container class="full-width-input">
+            <input matInput type="password" placeholder="Пароль" formControlName="password" required>
+            <mat-error *ngIf="isFieldInvalid('password')">Пожалуйста, введите свой пароль</mat-error>
+          </mat-input-container>
+          <div class='mat-body error' *ngIf="errorOccured">Пожалуйста, введите правильные логин и пароль.
+            Оба поля могут быть чувствительны к регистру</div>
+          <button mat-raised-button color="primary" type="submit">Войти</button>
+        </form>
+    </mat-card>
+  </div>
+</div>

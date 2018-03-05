@@ -1,0 +1,46 @@
+[
+    {
+        "domainname": "MCW\\Sonin",
+        "crm_id": "48ec9136-e995-e611-80c7-0050569365a3",
+        "portal_id": 456,
+        "first_name": "Дмитрий",
+        "last_name": "Крючков",
+        "middle_name": "Алексеевич",
+        "job_title": "Ведущий менеджер",
+        "image": "http://10.23.3.2:8080/media/employee/97d2eb43150f685326ccc46fb3ae0627d1ffa7fc/1_2018/avatar.jpg",
+        "head": {
+            "id": 12,
+            "domainname": "MCW\\goynova",
+            "crm_id": "5c622cad-e895-e611-80c7-0050569365a3",
+            "portal_id": 449,
+            "first_name": "Галина",
+            "last_name": "Гойнова",
+            "middle_name": "Николаевна",
+            "job_title": "Заместитель директора филиала - начальник отдела",
+            "image": "http://10.23.3.2:8080/media/employee/2292b81a22b1265e1cafc88c53d52c3733a8b44e/1_2018/avatar_nhEIoc8.jpg",
+            "mobile": "+7 (962) 953-1413",
+            "phone": null,
+            "email": "commerce7mcw@ruscon.global",
+            "skype": null,
+            "head": 8,
+            "users": []
+        },
+        "mobile": "8 (962) 953 12 25",
+        "phone": null,
+        "email": "commerce9mcw@ruscon.global",
+        "skype": null,
+        "users": [
+            {
+                "url": "http://10.23.3.2:8080/api/users/2/",
+                "username": "volgapaperru",
+                "first_name": "",
+                "last_name": "",
+                "email": "",
+                "profile": {
+                    "middle_name": "",
+                    "position": ""
+                }
+            }
+        ]
+    }
+]

@@ -1,0 +1,99 @@
+<div class="container mat-elevation-z8">
+  <div class="table-header">
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Фильтр">
+    </mat-form-field>
+  </div>
+  <mat-table *ngIf="dataSource" [dataSource]="dataSource" matSort>
+
+    <ng-container matColumnDef="container_number">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> № контейнера </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.container_number}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="size">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Размер </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.size}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Тип </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.type}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="line">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Линия </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.line}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="platform_number">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> № платформы </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.platform_number}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="foot">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Футовость </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.foot}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="length">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Условная длина </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.length}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="model">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Модель </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.model}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="mtu">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> ТУ, МТУ </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.mtu}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="train">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Поезд </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.train}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="invoice">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Накладная </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.invoice}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="departurestation">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Станция отправления </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.departurestation}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="departuredate">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Дата отправления </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.departuredate}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="destinationstation">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Станция назначения </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.destinationstation}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="totaldistance">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Общее расстояние </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.totaldistance}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="estimatedtime">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Расчетное время в пути </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.estimatedtime}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="operationstation">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Станция совершения операции </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.operationstation}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="daysinroute">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Дней в пути </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.daysinroute}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="remainingdistance">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Расстояние до станции назначения </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.remainingdistance}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="arrivaldate">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Дата прибытия на станцию назначения </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{row.arrivaldate}} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  <mat-paginator [length]="resultsLength" [pageSize]="10" [pageSizeOptions]="[5, 10, 15]" [showFirstLastButtons]="true">
+  </mat-paginator>
+</div>
+  

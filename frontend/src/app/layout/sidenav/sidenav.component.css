@@ -1,0 +1,36 @@
+ul {
+    list-style-type: none;
+    margin: 0 0;
+    padding-left: 49px;
+}
+
+a.submenu {
+    height: 40px;
+}
+
+a.submenu span {
+    font-size: 14px !important;
+}
+
+div.collapsed {
+    width:100%;
+    text-align:center;
+}
+
+div.collapsed mat-icon {
+    position: absolute;
+    bottom: 14px;
+    left: 24px;
+}
+
+mat-icon {
+    color: rgba(0, 0, 0, 0.54);
+}
+
+div.collapsed span {
+    width: 100%;
+    font-size: 9px !important;
+    position: absolute;
+    bottom: 6px;
+    left: 0px;
+}

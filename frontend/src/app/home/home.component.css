@@ -1,0 +1,98 @@
+.sidenav-content {
+    display: flex;
+    height: 100%;
+    align-items: top;
+    justify-content: left;
+}
+
+mat-card {
+    display: inline-block;
+    vertical-align: top;
+    margin: 15px;
+}
+
+mat-divider {
+    padding-bottom: 16px;
+}
+
+mat-card.manager {
+    width: 290px;
+    text-align: center;
+}
+
+mat-card.manager .phone {
+    display: inline-block;
+    padding-bottom: 15px;
+    margin-bottom: 0;
+}
+
+mat-card.manager .firstname {
+    margin-bottom: 8px;
+}
+
+mat-card.manager img.avatar {
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+}
+
+mat-card.manager mat-icon {
+    position: relative;
+    top: 3px;
+    font-size: 18px;
+}
+
+mat-card.news-container {
+    max-width: 560px;
+    min-width: 290px;
+    width: 85%;
+    margin-right: auto;
+}
+
+mat-card.news-container .news {
+    min-height: 56px;
+    margin-bottom: 16px;
+}
+
+mat-card.news-container .news .mat-caption {
+    font-size: 13px !important;
+    word-wrap: break-word;
+}
+
+mat-card.news-container .news a {
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.87);
+}
+
+mat-card.news-container .news a:hover {
+    text-decoration: none;
+    color: rgba(0, 0, 0, 1.0);
+}
+
+mat-card.news-container .news .date {
+    width: 52px;
+    margin-right: 10px;
+    float: left;
+    text-align: center;
+    background-color: #CCC;
+    border-radius: 10px;
+    color: #FFF;
+}
+
+mat-card.news-container .news .content {
+    margin-left: 62px;
+}
+
+mat-card.news-container .news .date .month {
+    font-size: 12px;
+    line-height: 18px;
+    padding-top: 6px;
+}
+
+mat-card.news-container .news .date .day {
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 26px;
+    padding-bottom: 6px;
+}
