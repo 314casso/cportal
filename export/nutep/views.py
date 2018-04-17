@@ -5,31 +5,30 @@ from __future__ import division
 import datetime
 import json
 import logging
+from datetime import timedelta
 
+import django_rq
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_unicode
+from django.utils.timezone import now
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import SingleObjectMixin
-import django_rq
-
-from rest_framework import viewsets, permissions
+from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from nutep.forms import ReviseForm, TrackingForm
-from nutep.models import News, DateQueryEvent
-from nutep.serializers import UserSerializer, DateQueryTrackingSerializer, \
-    EventStatusSerializer, DateQueryReviseSerializer, EmployeesSerializer,\
-    NewsSerializer
-from nutep.tasks import tracking_task, revise_task
-from django.utils.timezone import now
-from datetime import timedelta
-
+from nutep.models import (REVISE, TERMINAL_EXPORT, TRACKING, Company,
+                          DateQueryEvent, News)
+from nutep.serializers import (DateQueryReviseSerializer,                               
+                               EmployeesSerializer, EventStatusSerializer,
+                               NewsSerializer, UserSerializer)
+from nutep.tasks import revise_task
 
 logger = logging.getLogger('django.request')
 
@@ -56,19 +55,14 @@ class BaseView(TemplateView):
         limit = 5
         return News.objects.all()[:limit]
     
+    def get_company(self):
+        return self.request.user.companies.filter(membership__is_general=True).first()
+
     def get_dealstats(self, dateformat="%d.%m.%Y %H:%M:%S"):
-        company = self.request.user.companies.filter(membership__is_general=True).first()
+        company = self.get_company()
         if not company:
             return
-        deal_stats = company.details.get('DealStats')
-        if deal_stats:
-            result = {}
-            result['dealdate'] = datetime.datetime.strptime(deal_stats.get('FirstDeal'), dateformat)
-            result['totaldeals'] = deal_stats.get('TotalDeals')
-            result['lastmonth'] = deal_stats.get('LastMonth')
-            result['days_together'] = (datetime.datetime.now() - result['dealdate']).days
-            return result
-
+        
     def get_context_data(self, **kwargs):
         context = super(BaseView, self).get_context_data(**kwargs)
         manager = self.request.user.managers.first()
@@ -78,9 +72,7 @@ class BaseView(TemplateView):
             head = manager.head
             if head:
                 head.title = u"Руководитель менеджера"
-        
-        dealstats = self.get_dealstats()
-        
+                                
         start_date = datetime.date.today().replace(day=1)
         revise_form = ReviseForm(user=self.request.user, initial={'start_date': start_date.strftime('%d.%m.%Y')})
         tracking_form = TrackingForm(user=self.request.user)
@@ -89,74 +81,85 @@ class BaseView(TemplateView):
             'title': force_unicode('Рускон Онлайн'), 
             'manager': manager,
             'head': head,
-            'news': self.news(),
-            'dealstats': dealstats,
+            'news': self.news(),        
             'revise_form': revise_form,
             'tracking_form': tracking_form,
+            'company': self.get_company()
         })         
         return context
 
 
-def landing(request):
+def landing(request):    
     if request.user.is_authenticated():
-        return redirect('services')
-    context = {
-        'title': force_unicode('Рускон'),
-    }
-    return render(request, 'landing.html', context)
+        company = request.user.companies.filter(membership__is_general=True).first()        
+        if company:
+            return redirect(company.get_dashboard_url())                    
+        return redirect(Company.DASHBOARD_VIEW)
+    else:
+        return redirect('login')
 
 
-class ServiceView(BaseView):
-    template_name = 'base.html'
+class BaseService(BaseView):
+    TYPE = None
+    def get_service(self):
+        company = self.get_company()
+        service = company.services.get(client_service__type=self.TYPE)
+        return service
+    def get_context_data(self, **kwargs):
+        context = super(BaseService, self).get_context_data(**kwargs)        
+        context.update({
+            'service': self.get_service(),        
+        })
+        return context
+
+
+class DashboardView(BaseView):
+    template_name = 'dashboard.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ServiceView, self).get_context_data(**kwargs)
+        context = super(DashboardView, self).get_context_data(**kwargs)
         context.update({
             'title': force_unicode('Рускон Онлайн'),        
         })
         return context
 
 
+class ReviseView(BaseService):
+    TYPE = REVISE
+    template_name = 'revise.html'
+
+
 class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAdminUser,)
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-
-
-class TrackingViewSet(viewsets.ModelViewSet):     
-    serializer_class = DateQueryTrackingSerializer
-    def get_queryset(self):
-        return DateQueryEvent.objects.for_user(self.request.user).filter(type=DateQueryEvent.TRACKING).order_by('-date')[:1]
  
  
 class ReviseViewSet(viewsets.ModelViewSet):
     serializer_class = DateQueryReviseSerializer
     def get_queryset(self):
-        return DateQueryEvent.objects.for_user(self.request.user).filter(type=DateQueryEvent.REVISE).order_by('-date')[:1]
- 
- 
-class RailFreightTrackingAPIView(APIView):
-    def post(self, request):
-        job = tracking_task.delay(request.user)  # @UndefinedVariable        
-        return Response({ 'job': job.id })
-    
-    
-class ReviseAPIView(APIView):
-    def post(self, request):
+        return DateQueryEvent.objects.for_user(self.request.user).filter(type=REVISE).order_by('-date')[:1]
+
+
+class PingRevise(viewsets.ViewSet):
+    def list(self, request):
         today = now()
-        start_date = today - timedelta(days=360) 
+        key = u'last_ping_revise_%s' % request.user.pk
+        if cache.get(key):
+            return Response({'job': 'cached'})
+        cache.set(key, today, 300)   
+        start_date = today - timedelta(days=360)
         end_date = today
-        job = revise_task.delay(request.user, start_date, end_date)  # @UndefinedVariable        
-        return Response({ 'job': job.id })    
+        job = revise_task.delay(request.user, start_date, end_date)
+        return Response({'job': job.id})  
 
 
 class JobStatus(viewsets.ViewSet):
-    def retrieve(self, request, pk):        
-        print request.POST       
+    def retrieve(self, request, pk):                
         queue = django_rq.get_queue('default')
         job = queue.fetch_job(pk)
         status = job.status if job else None
-        return Response({ 'job': status })
+        return Response({'job': status})
     
 
 class DealStats(viewsets.ViewSet):
@@ -166,7 +169,7 @@ class DealStats(viewsets.ViewSet):
             return Response({})
         deal_stats = company.details.get('DealStats')
         if deal_stats:
-            return Response({ 'deal_stats': deal_stats })
+            return Response({'deal_stats': deal_stats})
         return Response({})    
     
 
@@ -186,6 +189,5 @@ class NewsViewSet(viewsets.ModelViewSet):
     limit = 5
     serializer_class = NewsSerializer
     def get_queryset(self):        
-        return News.objects.all()[:self.limit]                          
-                          
-                          
+        q = News.objects.all()
+        return q[:self.limit]

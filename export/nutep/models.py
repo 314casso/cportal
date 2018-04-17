@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 import datetime
+import hashlib
 import os
 
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import GenericForeignKey,\
+from django.contrib.contenttypes.fields import GenericForeignKey, \
     GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
-from django.utils.encoding import force_unicode
-from uuslug import slugify
-from django.utils.translation import ugettext_lazy as _
-import hashlib
 from django.contrib.postgres.fields.jsonb import JSONField
-from django.contrib.postgres.fields.array import ArrayField
+from django.db import models
+from django.urls import reverse
+from django.utils.encoding import force_unicode
+from django.utils.translation import ugettext_lazy as _
+from uuslug import slugify
+
+from nutep.utils import parse_nav
 
 
 def base_path(root, filename):    
@@ -46,6 +48,15 @@ class PrivateManager(models.Manager):
             return super(PrivateManager, self).get_queryset().none()
         return super(PrivateManager, self).get_queryset().filter(user=user)
     
+REVISE = 1    
+TRACKING = 2
+TERMINAL_EXPORT = 3
+
+TYPE_CHOICES = (
+    (REVISE, u'Взаиморасчеты'),
+    (TRACKING, u'Слежение'),
+    (TERMINAL_EXPORT, u'Экспорт на терминале'),
+)    
 
 class DateQueryEvent(models.Model):
     UNKNOWN = 300    
@@ -60,15 +71,6 @@ class DateQueryEvent(models.Model):
         (ERROR, u'Ошибка'),
     )
     
-    
-    REVISE = 1    
-    TRACKING = 2
-    
-    TYPE_CHOICES = (
-        (REVISE, u'Взаиморасчеты'),
-        (TRACKING, u'Слежение'),
-    )
-    
     date = models.DateTimeField(blank=True, auto_now=True, db_index=True, null=True)
     user = models.ForeignKey(User, blank=True, null=True)
     type = models.IntegerField(choices=TYPE_CHOICES, blank=True, null=True,)
@@ -81,71 +83,7 @@ class DateQueryEvent(models.Model):
     
     def __unicode__(self):
         return u'{0} {1} {2}'.format(self.pk, self.type, self.status)
-
-
-class Container(models.Model):
-    number = models.CharField(max_length=12)
-    size = models.CharField(blank=True, null=True, max_length=3)
-    type = models.CharField(blank=True, null=True, max_length=10)    
-    line = models.CharField(blank=True, null=True, max_length=150)
-    def __unicode__(self):
-        return u'{0}'.format(self.id)
-
-
-class Platform(models.Model):
-    number = models.CharField(max_length=50)
-    foot = models.IntegerField(blank=True, null=True)
-    length = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
-    model = models.CharField(max_length=50, blank=True, null=True)
-    mtu = models.CharField(max_length=50, blank=True, null=True)
-
-
-class RailData(models.Model):
-    train = models.CharField(max_length=50, blank=True, null=True)
-    invoice = models.CharField(max_length=50, blank=True, null=True)
-    departurestation = models.CharField(max_length=50, blank=True, null=True)
-    departuredate = models.DateField(blank=True, null=True)
-    destinationstation = models.CharField(max_length=50, blank=True, null=True)
-    totaldistance = models.IntegerField(blank=True, null=True)
-    estimatedtime = models.IntegerField(blank=True, null=True)
-
-
-class RailTracking(models.Model):    
-    operationstation = models.CharField(max_length=50, blank=True, null=True)
-    daysinroute = models.IntegerField(blank=True, null=True)
-    remainingdistance = models.IntegerField(blank=True, null=True)
-    arrivaldate = models.DateField(blank=True, null=True)
-
-
-class FreightData(models.Model):
-    bl = models.CharField(max_length=50, blank=True, null=True)
-    deal = models.CharField(max_length=50, blank=True, null=True)
-    vessel = models.CharField(max_length=50, blank=True, null=True)
-    voyage = models.CharField(max_length=50, blank=True, null=True)
-    dateoutplan = models.DateField(blank=True, null=True)
-    pod = models.CharField(max_length=50, blank=True, null=True)
-    podcountry = models.CharField(max_length=50, blank=True, null=True)
-
-
-class FreightTracking(models.Model):
-    departuredate = models.DateField(blank=True, null=True)
-    arrivaldate = models.DateField(blank=True, null=True)
-    pot = models.CharField(max_length=50, blank=True, null=True)
-    arrivaldatepot = models.DateField(blank=True, null=True)
-    departuredatepot = models.DateField(blank=True, null=True)
-    daysinroute = models.IntegerField(blank=True, null=True)
-    arrivaldateactual = models.DateField(blank=True, null=True)
-
-
-class RailFreightTracking(models.Model):
-    event = models.ForeignKey(DateQueryEvent, related_name="tracks")
-    container = models.ForeignKey(Container, blank=True, null=True)
-    platform = models.ForeignKey(Platform, blank=True, null=True)
-    raildata = models.ForeignKey(RailData, blank=True, null=True)
-    railtracking = models.ForeignKey(RailTracking, blank=True, null=True)
-    freightdata = models.ForeignKey(FreightData, blank=True, null=True)
-    freighttracking = models.ForeignKey(FreightTracking, blank=True, null=True)
-
+   
 
 class File(models.Model):   
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -153,9 +91,16 @@ class File(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     title = models.CharField(blank=True, null=True, max_length=255)    
     file = models.FileField(upload_to=attachment_path, blank=True, null=True,)
-    
     def __unicode__(self):
-        return force_unicode(self.title) 
+        return u'{0}'.format(self.title)
+
+
+class ClientService(models.Model):    
+    name = models.CharField(max_length=150)   
+    type = models.IntegerField(choices=TYPE_CHOICES, unique=True)
+    nav = models.CharField(max_length=150)       
+    def __unicode__(self):
+        return u'{0}'.format(self.name)
 
 
 class Team(models.Model):
@@ -170,15 +115,20 @@ class Team(models.Model):
 
 
 class Company(models.Model):
+    DASHBOARD_VIEW = 'dashboard'
     crm_guid = models.CharField(max_length=36, blank=True, null=True)
     ukt_guid = models.CharField(max_length=36, blank=True, null=True)
     name = models.CharField('Наименование', max_length=150, db_index=True)
+    dashboard_view = models.CharField(max_length=50, blank=True, null=True)
     members = models.ManyToManyField(User, blank=True, related_name="companies", through='Membership')
+    client_services = models.ManyToManyField(ClientService, blank=True, related_name="companies", through='CompanyService')
+    nomenclatures = models.ManyToManyField('Nomenclature', blank=True, related_name="companies", through='CompanyNomenclature')
     details = JSONField(blank=True, null=True,)
     INN = models.CharField(_('INN'), max_length=14, blank=True, null=True,)   
     KPP = models.CharField(_('KPP'), max_length=10, blank=True, null=True,)    
-    logo = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)
-    
+    logo = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)    
+    def get_dashboard_url(self):        
+        return reverse(self.dashboard_view if self.dashboard_view else self.DASHBOARD_VIEW)
     def __unicode__(self):
         return u'{0}'.format(self.name) 
     class Meta:
@@ -192,6 +142,34 @@ class Membership(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)    
     is_general = models.BooleanField(default=False)
     is_payer = models.BooleanField(default=False)
+    def __unicode__(self):
+        return u'{0}{1}'.format(self.user, self.company) 
+
+
+class CompanyService(models.Model):
+    client_service = models.ForeignKey(ClientService, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="services")    
+    title = models.CharField(max_length=150, blank=True, null=True,)   
+    nav = models.CharField(max_length=150, blank=True, null=True,)   
+    is_active = models.BooleanField(default=False)
+    is_menu = models.BooleanField(default=True)        
+    order = models.IntegerField(default=100)        
+    def get_nav_url(self):
+        nav = self.nav if self.nav else self.client_service.nav
+        return parse_nav(nav)
+    def __unicode__(self):
+        return u'{0}'.format(self.title if self.title else self.client_service) 
+    class Meta:
+        unique_together = ("company", "client_service")
+        ordering = ['order']
+
+
+class CompanyNomenclature(models.Model):
+    nomenclature = models.ForeignKey('Nomenclature', on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="nomencls")    
+    is_general = models.BooleanField(default=False)    
+    def __unicode__(self):
+        return u'{0}{1}'.format(self.nomenclature, self.company) 
 
 
 class BaseModelManager(models.Manager):    
@@ -326,17 +304,22 @@ class CompanyManager(models.Model):
     employee = models.ForeignKey(Employee, related_name='membership')
     user = models.ForeignKey(User, related_name='membership')
     scope = models.ForeignKey(Scope, blank=True, null=True,)
-    
     def __unicode__(self):
         return u"%s is in group %s (as %s)" % (self.employee, self.user, self.scope)
 
 
 class InfoSource(models.Model):
-    name = models.CharField(u'Наименование', max_length=150, db_index=True)
-    
+    name = models.CharField(u'Наименование', max_length=150, db_index=True)    
     def __unicode__(self):
         return u'{0}'.format(self.name)
-    
+
+
+class Nomenclature(models.Model):    
+    ukt_guid = models.CharField(max_length=36, blank=True, null=True)
+    name = models.CharField('Наименование', max_length=150, db_index=True)
+    def __unicode__(self):
+        return u'{0}'.format(self.name)
+
 
 class News(ProcessDeletedModel):    
     date = models.DateTimeField(db_index=True)
@@ -344,12 +327,7 @@ class News(ProcessDeletedModel):
     summary = models.CharField(_('summary'), max_length=250)
     url = models.CharField(_('url'), max_length=250)
     info_source = models.ForeignKey(InfoSource)
-    
     class Meta:
         ordering = ('-date', )
-    
     def __unicode__(self):
         return u'{0}'.format(self.title)
-
-
-        

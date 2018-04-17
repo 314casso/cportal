@@ -1,0 +1,346 @@
+{% extends "app/base_site.html" %}
+
+{% block title %}{% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}    
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="right_col" role="main">
+
+    <div class="row">
+                 
+        <div class="clearfix"></div>
+        
+        <div class="x_content">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>{{ service }}</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>                  
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content" id="app-tracking">   
+                    <div v-if="loading" class='cssload-jumping'><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="clearfix"></div>  
+                    <div v-for="item in items" v-cloak>
+                      <div class="col-md-4 col-sm-4 col-xs-4" role="tabpanel">                          
+                            <div class="panel panel-default">
+                            <div class="panel-heading"><i class="fa fa-save"></i> Файлы для скачивания
+                                <div class="pull-right">
+                                    <label class="label label-info" title="Дата обновления информации">
+                                        <% item.date | moment %>
+                                    </label>
+                                </div>
+                            </div>                              
+                            <div class="panel-body">
+                                <div v-for="file in item.files" class="list-group"> 
+                                    <a href="#" class="list-group-item list-group-item-info" v-on:click="open(file.file)"><strong><% file.title | upper %></strong></a>
+                                </div>
+                            </div>
+                            </div>
+                            <div v-if="error" class="alert alert-danger">
+                                <strong>Ошибка!</strong>
+                                <% error %>
+                            </div>              
+                      </div>  
+                      <div class="clearfix"></div>
+                      <div class="col-md-4 col-sm-4 col-xs-4">
+
+                        <div class="input-group">
+                          <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                          <input v-model='search' type="search" class="form-control" name="search" placeholder="Поиск контейнера...">
+                          <span class="input-group-btn">
+                                    <button class="btn btn-default" v-on:click="clearSearch" type="button"><i class="glyphicon glyphicon-remove"></i></button>
+                                  </span>
+                        </div>
+
+                        <div class="table-fixed">
+                          <table class="table table-hover">
+                            <thead>                              
+                              <tr>
+                                <th></th>
+                                <th>Размер</th>
+                                <th>Тип</th>
+                                <th>Номер <i class="fa fa-fw fa-sort-asc"></i></th>
+                                <th>Линия</th>                              
+                              </tr>
+                            </thead>
+                            <tbody>                                                                             
+                              <tr v-if="track.container" role="button" class="datarow" v-for="track in itemTracks(item)" v-on:click="setCurrentItem(track)" v-bind:class="{active: track == currentItem }">
+                                <td><i v-bind:class="{'glyphicon glyphicon-play': track == currentItem }"></i></td>
+                                <td><% track.container.size %></td>
+                                <td><% track.container.type %></td>
+                                <th scope="row"><% track.container.number %></th>
+                                <td><% track.container.line %></td>
+                              </tr>                                         
+                            </tbody>
+                          </table>
+                        </div>                       
+
+                        </div>
+                        <div class="col-md-8 col-sm-8 col-xs-8" v-if="currentItem">
+                          <div class="panel panel-default">
+                              <div class="panel-heading"><i class="fa fa-info-circle"></i> <strong><% currentItem.container.number %></strong> 
+                                <div class="pull-right">
+                                  <label class="label label-info"><% currentItem.container.size %><% currentItem.container.type %> <% currentItem.container.line %></label>
+                                </div>
+                              </div>
+                              <div class="panel-body">
+                                <table class="table table-bordered table-key-value">
+                                    <tbody>
+                                        <tr class="tr-title">
+                                            <th colspan="2">Платформа</th>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-if="currentItem.platform">
+                                        <tr>
+                                            <th class="w_25">Номер</th>
+                                            <td>
+                                                <% currentItem.platform.number %>
+                                            </td>
+                                        </tr>                                    
+                                        <tr>
+                                            <th>Футовость</th>
+                                            <td>
+                                                <% currentItem.platform.foot %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Длина</th>
+                                            <td>
+                                                <% currentItem.platform.length %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Модель</th>
+                                            <td>
+                                                <% currentItem.platform.model %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>ТУ, мту</th>
+                                            <td>
+                                                <% currentItem.platform.mtu %>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr class="tr-title">
+                                            <th colspan="2">Исходные данные по ЖД отправлению</th>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-if="currentItem.raildata">
+                                        <tr>
+                                            <th>Поезд</th>
+                                            <td>
+                                                <% currentItem.raildata.train %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Накладная</th>
+                                            <td>
+                                                <% currentItem.raildata.invoice %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Станция отправления</th>
+                                            <td>
+                                                <% currentItem.raildata.departurestation %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Дата отправления</th>
+                                            <td>
+                                                <% currentItem.raildata.departuredate %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Станция назначения</th>
+                                            <td>
+                                                <% currentItem.raildata.destinationstation %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Общее расстояние</th>
+                                            <td>
+                                                <% currentItem.raildata.totaldistance %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Расчётное время в пути</th>
+                                            <td>
+                                                <% currentItem.raildata.estimatedtime %>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr class="tr-title">
+                                            <th colspan="2">Данные ЖД слежения</th>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-if="currentItem.railtracking">
+                                        <tr>
+                                            <th>Станция совершения операции</th>
+                                            <td>
+                                                <% currentItem.railtracking.operationstation %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Дней в пути</th>
+                                            <td>
+                                                <% currentItem.railtracking.daysinroute %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Расстояние до станции назначения</th>
+                                            <td>
+                                                <% currentItem.railtracking.remainingdistance %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Дата прибытия на станцию назначения</th>
+                                            <td>
+                                                <% currentItem.railtracking.arrivaldate | shortdate %>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr class="tr-title">
+                                            <th colspan="2">Порт</th>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-if="currentItem">
+                                        <tr>
+                                            <th>Терминал</th>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Дата захода в порт</th>
+                                            <td></td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr class="tr-title">
+                                            <th colspan="2">Исходные данные морской перевозки</th>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-if="currentItem.freightdata">
+                                        <tr>
+                                            <th>Номер коносамента</th>
+                                            <td>
+                                                <% currentItem.freightdata.bl %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Номер заказа</th>
+                                            <td>
+                                                <% currentItem.freightdata.deal %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Судно</th>
+                                            <td>
+                                                <% currentItem.freightdata.vessel %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Рейс</th>
+                                            <td>
+                                                <% currentItem.freightdata.voyage %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Планируемая дата ухода судна из порта отправления</th>
+                                            <td>
+                                                <% currentItem.freightdata.dateoutplan | shortdate %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Порт назначения</th>
+                                            <td>
+                                                <% currentItem.freightdata.pod %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Страна назначения</th>
+                                            <td>
+                                                <% currentItem.freightdata.podcountry %>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tbody>
+                                        <tr class="tr-title">
+                                            <th colspan="2">Данные слежения по морю</th>
+                                        </tr>
+                                    </tbody>
+                                    <tbody v-if="currentItem.freighttracking">
+                                        <tr>
+                                            <th>Фактическая дата ухода судна из порта отправления</th>
+                                            <td>
+                                                <% currentItem.freighttracking.departuredate | shortdate %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Планируемая дата прибытия в порт назначения</th>
+                                            <td>
+                                                <% currentItem.freighttracking.arrivaldate | shortdate %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Порт перевалки</th>
+                                            <td>
+                                                <% currentItem.freighttracking.pot %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Дата прибытия в порт перевалки</th>
+                                            <td>
+                                                <% currentItem.freighttracking.arrivaldatepot | shortdate %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Дата отправления из порта перевалки</th>
+                                            <td>
+                                                <% currentItem.freighttracking.departuredatepot | shortdate %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Дней в пути</th>
+                                            <td>
+                                                <% currentItem.freighttracking.daysinroute %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Фактическая дата прибытия в порт назначения</th>
+                                            <td>
+                                                <% currentItem.freighttracking.arrivaldateactual | shortdate %>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                              </div>
+                            </div>
+                        </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+     </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+  <script src="/static/vendors/vue/vue.min.js"></script>  
+  <script src="/static/build/js/app/tracking.js?0.001" type="module"></script>
+{% endblock javascripts %}

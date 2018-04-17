@@ -1,0 +1,58 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} {{ title }} {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <!-- Animate.css -->
+  <link href="/static/vendors/animate.css/animate.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block body_class %}login{% endblock body_class %}
+
+{% block body %}
+<div> 
+  <div class="login_wrapper">
+    <div class="animate form login_form">
+      <section class="login_content">
+        <form method="post">
+         {% csrf_token %}
+          <h1>Авторизация</h1>
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              {{ form.non_field_errors }}
+            </div> 
+        {% endif %}            
+          <div>
+        {{ form.username.errors }}
+            <input id="id_username" name="username" type="text" class="form-control" placeholder="Username" required="" />
+          </div>
+          <div>
+            {{ form.password.errors }}
+            <input id="id_password" name="password" type="password" class="form-control" placeholder="Password" required="" />
+          </div>
+          <div>
+            <input class="btn btn-default submit" type="submit" value="Войти">                
+            <a class="reset_pass" href="#">Забыли пароль?</a>
+          </div>
+
+          <div class="clearfix"></div>
+
+          <div class="separator">
+
+            <div class="clearfix"></div>
+            <br />
+
+            <div>
+              <h1><i class="fa fa-ship"></i> Ruscon online</h1>
+              <p>©1997-{% now "Y" %} «Рускон» <a href="http://ruscon.global">эксперт контейнерных перевозок</a></p>
+            </div>
+          </div>
+        </form>
+      </section>
+    </div>
+            
+  </div>
+</div>
+</body>
+{% endblock body %}

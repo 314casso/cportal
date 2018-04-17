@@ -42,7 +42,7 @@ LANGUAGE_CODE = 'ru-RU'
 DEFAULT_LANGUAGE = 'ru'
 LANGUAGES = [('ru', u'Русский')]
 
-LOGIN_REDIRECT_URL = '/services'
+LOGIN_REDIRECT_URL = '/'
 
 SITE_ID = 1
 
@@ -83,11 +83,14 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -168,9 +171,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'corsheaders',
+    'django.contrib.staticfiles',        
+    'corsheaders',    
     'nutep',
+    'terminal_export',
+    'tracking',
     'django.contrib.admin',    
     'easy_thumbnails',
     'django_select2',

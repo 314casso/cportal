@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import json
+
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-
-from nutep.models import (BaseError, UserProfile, Team, CompanyManager,
-    Employee, News, InfoSource, File, Company, Membership, DateQueryEvent,
-    Container, RailFreightTracking)
-from nutep.services import DealService
-from export.local_settings import WEB_SERVISES
-import json
 from django.contrib.contenttypes.admin import GenericTabularInline
+
+from export.local_settings import WEB_SERVISES
+from nutep.models import (BaseError, ClientService, Company, CompanyManager,
+                          CompanyNomenclature, CompanyService, DateQueryEvent,
+                          Employee, File, InfoSource, Membership, News,
+                          Nomenclature, Team, UserProfile)
+from nutep.services import DealService
 
 admin.site.unregister(User)
 
@@ -33,18 +35,28 @@ class FileInline(GenericTabularInline):
     extra = 1
     
     
-class CompanyInline(admin.TabularInline):
+class CompanyMembership(admin.TabularInline):
     model = Membership  # @UndefinedVariable
     extra = 1
-        
-    
+
+
+class CompanyServiceInline(admin.TabularInline):
+    model = CompanyService  # @UndefinedVariable
+    extra = 1    
+
+
+class CompanyNomenclatureInline(admin.TabularInline):
+    model = CompanyNomenclature  # @UndefinedVariable
+    extra = 1    
+
+
 class TeamInline(admin.TabularInline):
     model = Team.users.through  # @UndefinedVariable
     extra = 1
 
 
 class UserProfileAdmin(UserAdmin):    
-    inlines = [UserProfileInline, CompanyInline, TeamInline, ManagerInline, FileInline]
+    inlines = [UserProfileInline, CompanyMembership, TeamInline, ManagerInline, FileInline]
     
     actions = ['get_deal_stats']
     
@@ -63,7 +75,7 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 class CompanyAdmin(admin.ModelAdmin):  
-    pass
+    inlines = [CompanyServiceInline, CompanyNomenclatureInline]
 
 
 class EmployeeAdmin(admin.ModelAdmin):
@@ -84,10 +96,11 @@ class ErrorInline(GenericTabularInline):
 
 
 class DateQueryEventAdmin(admin.ModelAdmin):
+    list_display = ['date', 'id']
     inlines = [ErrorInline, FileInline]
 
 
-class ContainerAdmin(admin.ModelAdmin):
+class ClientServiceAdmin(admin.ModelAdmin):
     pass
 
 
@@ -100,6 +113,5 @@ admin.site.register(InfoSource, InfoSourceAdmin)
 admin.site.register(File, FileAdmin)
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(DateQueryEvent, DateQueryEventAdmin)
-admin.site.register(Container, ContainerAdmin)
-admin.site.register(RailFreightTracking)
-
+admin.site.register(ClientService, ClientServiceAdmin)
+admin.site.register(Nomenclature)
