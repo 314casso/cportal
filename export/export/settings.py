@@ -181,8 +181,10 @@ INSTALLED_APPS = (
     'debug_toolbar',
 )
 
+BASE_RQ_PROC = 'cportal'
+
 RQ_QUEUES = {
-    'default': {
+    BASE_RQ_PROC: {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,        

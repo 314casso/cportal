@@ -1,10 +1,11 @@
 from django_rq import job
 
+from export.settings import BASE_RQ_PROC 
 from export.local_settings import WEB_SERVISES
 from terminal_export.services import TerminalExportService
 
 
-@job('default')
+@job(BASE_RQ_PROC)
 def terminal_export_task(user):            
     service = TerminalExportService(WEB_SERVISES['cp'])
     service.get_export(user)      

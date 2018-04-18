@@ -2,11 +2,12 @@ import json
 
 from django_rq import job
 
-from export.local_settings import WEB_SERVISES
+from export.settings import BASE_RQ_PROC 
+from export.local_settings import WEB_SERVISES 
 from nutep.services import DealService, ReviseService
 
 
-@job('default')
+@job(BASE_RQ_PROC)
 def update_user(user):    
     company = user.companies.filter(membership__is_general=True).first()
     if not company:
@@ -16,7 +17,7 @@ def update_user(user):
     company.details = json.loads(deal_stats)
     company.save()
 
-@job('default')
+@job(BASE_RQ_PROC)
 def revise_task(user, start_date, end_date):            
     service = ReviseService(WEB_SERVISES['erp'])
     service.get_revise(user, start_date, end_date)                        
