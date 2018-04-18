@@ -29,6 +29,7 @@ from nutep.serializers import (DateQueryReviseSerializer,
                                EmployeesSerializer, EventStatusSerializer,
                                NewsSerializer, UserSerializer)
 from nutep.tasks import revise_task
+from export.settings import BASE_RQ_PROC
 
 logger = logging.getLogger('django.request')
 
@@ -156,7 +157,7 @@ class PingRevise(viewsets.ViewSet):
 
 class JobStatus(viewsets.ViewSet):
     def retrieve(self, request, pk):                
-        queue = django_rq.get_queue('default')
+        queue = django_rq.get_queue(BASE_RQ_PROC)
         job = queue.fetch_job(pk)
         status = job.status if job else None
         return Response({'job': status})
