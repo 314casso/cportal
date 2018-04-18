@@ -83,14 +83,11 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
-
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'pipeline.finders.PipelineFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder'    
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
