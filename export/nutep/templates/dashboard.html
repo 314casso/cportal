@@ -12,20 +12,22 @@
     <!-- top tiles -->
     <div class="row tile_count">
         <div id="app-dealstats" v-cloak>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-clock-o"></i> Дата первой сделки</span>              
-                <div class="count"><% data.firstdeal | shortdate %></div>
-                <span class="count_bottom"><i class="green"><% data.daystogether %></i> дней сотрудничества</span>
+            <div v-if="data">
+                <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-clock-o"></i> Дата первой сделки</span>              
+                    <div class="count"><% data.firstdeal | shortdate %></div>
+                    <span class="count_bottom"><i class="green"><% data.daystogether %></i> дней сотрудничества</span>
+                </div>
+                <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                    <span class="count_top"><i class="fa fa-shopping-bag"></i> Общее количество сделок</span>
+                    <div class="count"><% data.totaldeals %></div>
+                    <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i><% data.lastmonth %> </i> за последний месяц</span>
+                </div>                               
+                <div v-if="error" class="alert alert-danger">
+                    <strong>Ошибка!</strong>
+                    <% error %>
+                </div>                    
             </div>
-            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
-                <span class="count_top"><i class="fa fa-shopping-bag"></i> Общее количество сделок</span>
-                <div class="count"><% data.totaldeals %></div>
-                <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i><% data.lastmonth %> </i> за последний месяц</span>
-            </div>                               
-            <div v-if="error" class="alert alert-danger">
-                <strong>Ошибка!</strong>
-                <% error %>
-            </div>                    
         </div> 
     </div>
     
