@@ -68,6 +68,7 @@
                               <thead>                              
                                 <tr>
                                   <th>&nbsp;</th>
+                                  <th>#</th>
                                   <th>Номер <i class="fa fa-fw fa-sort-asc"></i></th>
                                   <th>Размер</th>
                                   <th>Тип</th>                                
@@ -75,8 +76,9 @@
                                 </tr>
                               </thead>
                               <tbody>                                                                             
-                                <tr v-if="row.container" role="button" class="datarow" v-for="row in rows(item)" v-on:click="setCurrentItem(row)" v-bind:class="{active: row == currentItem }">
+                                <tr v-if="row.container" role="button" class="datarow" v-for="row in rows(item)" v-on:click="setCurrentItem(row)" v-bind:class="{active: row == currentItem }">                                  
                                   <td><i v-bind:class="{'glyphicon glyphicon-play': row == currentItem }"></i></td>
+                                  <td><% row.rowindex %></td>
                                   <th scope="row"><% row.container.number %></th>
                                   <td><% row.container.size %></td>
                                   <td><% row.container.type %></td>                                

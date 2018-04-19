@@ -10,7 +10,7 @@ from nutep.models import DateQueryEvent, Nomenclature
 class Container(BaseContainer):
     emptyweight = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
     seal = models.CharField(max_length=150, blank=True, null=True)
-
+    
 
 class Stuffing(models.Model):
     container = models.ForeignKey(Container, blank=True, null=True, related_name="stuffs")    
@@ -20,6 +20,8 @@ class Stuffing(models.Model):
     quantity = models.IntegerField(blank=True, null=True)
     grossweight = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
     netweight = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    class Meta:
+        ordering = ('id',)
 
 
 class TerminalExport(models.Model):
@@ -27,4 +29,6 @@ class TerminalExport(models.Model):
     event = models.ForeignKey(DateQueryEvent, related_name="terminalexports")
     container = models.OneToOneField(Container, blank=True, null=True)
     nomenclature = models.ForeignKey(Nomenclature, blank=True, null=True)    
+    class Meta:
+        ordering = ('rowindex',)
     
