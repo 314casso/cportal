@@ -80,11 +80,11 @@ class CRMService(object):
         if employee.crm_id:
             return
         user = self.get_user(employee.domainname)
-        for k, v in user.items():
-            if hasattr(employee, k):
-                setattr(employee, k, v)
-        if not employee.head:
-            print user['parent_crm_id']
+        if user:
+            for k, v in user.items():
+                if hasattr(employee, k):
+                    setattr(employee, k, v)
+        if not employee.head:            
             head = self.get_user(user['parent_crm_id'])
             if head:
                 obj, created = Employee.objects.get_or_create(domainname=head['domainname'])  # @UnusedVariable
@@ -103,14 +103,15 @@ class PortalService(object):
         if employee.portal_id:
             return        
         user = self.get_user(employee.domainname, employee.email)        
-        for k, v in user.items():
-            if hasattr(employee, k):
-                setattr(employee, k, v)
+        if user:
+            for k, v in user.items():
+                if hasattr(employee, k):
+                    setattr(employee, k, v)
 
-        if 'imagedata' in user:
-            imagedata = user.get('imagedata') 
-            if not imagedata:
-                return       
-            ext = 'jpg'
-            imagedata = ContentFile(base64.b64decode(imagedata), name='avatar.' + ext)
-            employee.image.save('avatar.jpg', imagedata)           
+            if 'imagedata' in user:
+                imagedata = user.get('imagedata') 
+                if not imagedata:
+                    return       
+                ext = 'jpg'
+                imagedata = ContentFile(base64.b64decode(imagedata), name='avatar.' + ext)
+                employee.image.save('avatar.jpg', imagedata)           

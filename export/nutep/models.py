@@ -280,10 +280,10 @@ class Employee(models.Model):
     job_title = models.CharField(_('job title'), max_length=100, null=True, blank=True)
     image = models.ImageField(upload_to=employee_path, blank=True, null=True,)
     head = models.ForeignKey('self', blank=True, null=True)
-    mobile = models.CharField(_('mobile'), max_length=20, blank=True)
-    phone = models.CharField(_('phone'), max_length=20, blank=True, null=True,)   
+    mobile = models.CharField(_('mobile'), max_length=50, blank=True)
+    phone = models.CharField(_('phone'), max_length=50, blank=True, null=True,)   
     email = models.EmailField(_('email'), blank=True)
-    skype = models.CharField(_('skype'), max_length=20, blank=True, null=True,)  
+    skype = models.CharField(_('skype'), max_length=50, blank=True, null=True,)  
     users = models.ManyToManyField(User, through='CompanyManager', related_name='managers')  
     
     def fullname(self):

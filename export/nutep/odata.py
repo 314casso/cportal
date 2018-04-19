@@ -49,11 +49,17 @@ class CRM(BaseSession):
 
 
 class Portal(BaseSession):
+    def set_session(self, username, password):
+        if not self.session:        
+            session = requests.Session()
+            session.auth = (username, password)
+            self.session = session
     def get_systemuser(self, domainname, email):
         domain, login = domainname.split("\\")                 
         url = self.make_url('get_user.php')
         self.session.get(url)      
         r = self.session.post(url, data={'LOGIN': login, 'EXTERNAL_AUTH_ID': domain.upper(), 'EMAIL': email})
+        print r.text
         if not r.status_code == 200:
             return
         try:
