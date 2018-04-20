@@ -3,8 +3,8 @@
   <div class="navbar nav_title" style="border: 0;">
       <a href="{{ company.get_dashboard_url }}" class="site_title">
         <i class="fa fa-tachometer"></i>
-        <span>
-          Личный кабинет
+        <span title="{{ company }}">
+            {{ company }}
         </span>
       </a>
   </div>
@@ -19,9 +19,10 @@
     <div class="profile_info">
       {% if request.user.is_authenticated %}
       <span>Здравствуйте,</span>
+      <small>{{ request.user.profile.get_fullname }}</small>
       {% else %}
-      <a href="{% url 'login' %}">Войти</a>{% endif %}
-      <h2>{{ request.user.profile.get_fullname }}</h2>
+      <a href="{% url 'login' %}">Войти</a>
+      {% endif %}      
     </div>
   </div>
   <!-- /menu profile quick info -->
