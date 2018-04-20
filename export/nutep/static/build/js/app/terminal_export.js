@@ -28,18 +28,17 @@ var appTerminalExport = new Vue({
         },
         fetchData: function () {
             console.log("fetchData");
-            var xhr = new XMLHttpRequest();
-            var self = this;
+            var xhr = new XMLHttpRequest();            
             xhr.open('GET', '/api/terminalexportevents/');
-            xhr.onload = function () {
+            xhr.onload = () => {
                 try {
                     var data = JSON.parse(xhr.responseText, utils.reviver);
-                    self.items = data;	
+                    this.items = data;	
                     if (data && data[0].terminalexports) {				                        
-                        self.currentItem = data[0].terminalexports[0];
+                        this.currentItem = data[0].terminalexports[0];
                     }					
                 } catch (e) {
-                    self.error = "Произошла ошибка обновления данных: " + e;
+                    this.error = "Произошла ошибка обновления данных: " + e;
                 }
             };
             xhr.send();
@@ -81,16 +80,16 @@ var appTerminalExport = new Vue({
         },
     },
     filters: {
-        shortdate: function (date) {
+        shortdate: (date) => {
             return utils.shortdate(date);
         },
-        moment: function (date) {				
+        moment: (date) => {				
             return utils.moment(date);									
         },
-        upper: function (date) {
+        upper: (date) => {
             return utils.upper(date);					
         },
-        number: function (x) {
+        number: (x) => {
             return utils.number(x);					
         },
     },

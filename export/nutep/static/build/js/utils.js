@@ -1,14 +1,14 @@
 export {utils}
 
 const utils = {		    
-    reviver: function reviver(key, value) {
+    reviver: (key, value) => {
         const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
         if (typeof value === "string" && dateFormat.test(value)) {
             return new Date(value);
         }    
         return value;
     },
-    checkJob: function (job, app) {					
+    checkJob: (job, app) => {					
         app.loading = true;			
         var xhr = new XMLHttpRequest();			
         if (!job) {									
@@ -16,7 +16,7 @@ const utils = {
             return;
         }
         xhr.open('GET', '/api/jobstatus/' + job + '/');
-        xhr.onload = function () {
+        xhr.onload = () => {
             try {
                 var resp = JSON.parse(xhr.responseText);
             } catch (e) {
@@ -33,13 +33,13 @@ const utils = {
                 }
             }
         };
-        xhr.error = function (e) {
+        xhr.error = (e) => {
             app.loading = false;
             app.error = "Error " + e.target.status + " occurred while receiving the document.";
         };
         xhr.send();
     },
-    pingData: function (url, app) {
+    pingData: (url, app) => {
         var xhr = new XMLHttpRequest();			
         app.loading = true;
         xhr.open('GET', url);
@@ -50,28 +50,28 @@ const utils = {
         xhr.send();
     },
     
-    shortdate: function (date) {
+    shortdate: (date) => {
         if (date) {
             return moment(date).format('DD.MM.YY');
         }
     },    
-    moment: function (date) {
+    moment: (date) => {
         if (date) {
             return moment(date).format('DD.MM.YYYY HH:mm');
         }
     },
-    upper: function (date) {
+    upper: (date) => {
         if (date) {
             return date.toUpperCase();
         }
     },
-    number: function(x) {
+    number: (x) => {
         if (!x) {
             return null;
         }
         return parseFloat(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(160));
     },
-    sum: function(items, prop){
+    sum: (items, prop) => {
         return items.reduce( function(a, b){
             return a + parseFloat(b[prop]);
         }, 0);
