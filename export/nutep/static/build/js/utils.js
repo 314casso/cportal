@@ -66,6 +66,14 @@ const utils = {
         }
     },
     number: function(x) {
+        if (!x) {
+            return null;
+        }
         return parseFloat(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(160));
+    },
+    sum: function(items, prop){
+        return items.reduce( function(a, b){
+            return a + parseFloat(b[prop]);
+        }, 0);
     }
   };

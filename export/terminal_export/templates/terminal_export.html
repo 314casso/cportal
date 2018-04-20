@@ -103,29 +103,47 @@
                                             <th colspan="2">Контейнер</th>
                                         </tr>
                                     </tbody>
-                                    <tbody v-if="currentItem.container">
+                                    <tbody v-if="setContainer(currentItem)">
                                         <tr>
                                             <th>Размер и тип</th>
                                             <td>
-                                                <% currentItem.container.size %><% currentItem.container.type %>
+                                                <% container.size %><% container.type %>                                                
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Линия</th>
                                             <td>
-                                                <% currentItem.container.line %>
+                                                <% container.line %>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th class="w_25">Вес порожнего</th>
                                             <td>
-                                                <% currentItem.container.emptyweight | number %>
+                                                <% container.emptyweight | number %>
                                             </td>
-                                        </tr>                                    
+                                        </tr>
+                                        <tr>
+                                            <th>Количество</th>
+                                            <td>
+                                                <% container.total.quantity | number %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Вес нетто</th>
+                                            <td>
+                                                <% container.total.netweight | number %>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Вес брутто</th>
+                                            <td>
+                                                <% container.total.grossweight | number %>
+                                            </td>
+                                        </tr>                                                                            
                                         <tr>
                                             <th>Пломба</th>
                                             <td>
-                                                <% currentItem.container.seal %>
+                                                <% container.seal %>
                                             </td>
                                         </tr>                                                                                                                        
                                     </tbody>                                                                         

@@ -7,7 +7,8 @@ var appTerminalExport = new Vue({
         loading: false,
         error: '',
         search: '',
-        currentItem: null
+        currentItem: null,
+        container: null,
     },
     delimiters: ["<%", "%>"],
     mounted() {			
@@ -51,6 +52,20 @@ var appTerminalExport = new Vue({
         },
         setCurrentItem: function (item) {
             this.currentItem = item;
+        },
+        setContainer: function (terminalexport) {
+            if (!terminalexport.container) {
+                return false;
+            }
+            this.container = terminalexport.container;            
+            if (this.container.stuffs) {                
+                this.container.total = {
+                    'netweight': utils.sum(this.container.stuffs, 'netweight'),
+                    'grossweight': utils.sum(this.container.stuffs, 'grossweight'),
+                    'quantity': utils.sum(this.container.stuffs, 'quantity')                
+                }
+            }
+            return true;
         },
         rows: function (item) {
             if (item) {
