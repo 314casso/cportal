@@ -51,11 +51,13 @@ class PrivateManager(models.Manager):
 REVISE = 1    
 TRACKING = 2
 TERMINAL_EXPORT = 3
+CONTPICS = 4
 
 TYPE_CHOICES = (
     (REVISE, u'Взаиморасчеты'),
     (TRACKING, u'Слежение'),
     (TERMINAL_EXPORT, u'Экспорт на терминале'),
+    (CONTPICS, u'Фото контейнеров'),
 )    
 
 class DateQueryEvent(models.Model):

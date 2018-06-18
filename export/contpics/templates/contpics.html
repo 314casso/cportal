@@ -1,0 +1,83 @@
+{% extends "app/base_site.html" %}
+
+{% block title %}{% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}   
+  <link href="/static/vendors/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet">  
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="right_col" role="main">
+
+    <div class="row">
+        
+        <div class="page-title">
+          <div class="title_left">
+            <h3>{{ service }} </h3>
+          </div>
+        </div>
+  
+        <div class="clearfix"></div>
+        
+        <div class="x_content">
+          <div class="col-md-4 col-sm-4 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>Файлы для скачивания</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>                  
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <div class="" role="tabpanel">
+                      <div id="app-contpics" v-cloak>                       
+                        <div v-if="loading" class='cssload-jumping'><span></span><span></span><span></span><span></span><span></span></div>
+                        <div class="clearfix"></div>  
+                        
+                          <form v-on:submit.prevent="pingService"> 
+                              <div class="input-group">
+                                  <input type="text" class="form-control" id="period" required>
+                                  <span class="input-group-btn">                                  
+                                  <button type="submit" class="btn btn-primary">Отправить</button>
+                                  </span>
+                              </div>                        
+                          </form>
+                        
+                        <div class="panel panel-default">
+                          <div class="panel-heading">Обновлено <% updated | moment %></div>
+                          <div class="panel-body">
+                            <div v-for="item in items"> 
+                              <div v-for="file in item.files" class="list-group"> 
+                                  <a href="#" class="list-group-item list-group-item-info" v-on:click="open(file.file)"><i class="fa fa-save"></i> <strong><% file.title | upper %></strong></a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div v-if="error" class="alert alert-danger">
+                            <strong>Ошибка!</strong>
+                            <% error %>
+                        </div>                                            
+                      </div>
+                  </div>  
+                </div>
+              </div>
+            </div>
+          </div>
+     </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+  <script src="/static/vendors/vue/vue.min.js"></script>  
+  <script src="/static/vendors/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>  
+  <script src="/static/vendors/bootstrap-datepicker/locales/bootstrap-datepicker.ru.min.js"></script>  
+  <script src="/static/build/js/app/contpics.js?0.001" type="module"></script>
+  
+{% endblock javascripts %}

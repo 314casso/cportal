@@ -173,6 +173,7 @@ INSTALLED_APPS = (
     'nutep',
     'terminal_export',
     'tracking',
+    'contpics',
     'django.contrib.admin',    
     'easy_thumbnails',
     'django_select2',

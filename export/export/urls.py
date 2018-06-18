@@ -9,6 +9,7 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 from nutep import views as nutep_views
 from terminal_export import views as terminal_export_views
 from tracking import views as tracking_views
+from contpics import views as contpics_views
 
 
 admin.autodiscover()
@@ -32,6 +33,8 @@ urlpatterns += [
     url(r'^tracking/$', tracking_views.TrackingView.as_view(), name='tracking'),
     url(r'^revise/$', nutep_views.ReviseView.as_view(), name='revise'),
     url(r'^terminalexport/$', terminal_export_views.TerminalExportView.as_view(), name='terminalexport'),
+    url(r'^contpics/$', contpics_views.DashboardView.as_view(), name='contpics'),
+    url(r'pingcontpics/(?P<start_date>\d{8})/$', contpics_views.ping_contpics, name='pingcontpics'),
 ]
 
 urlpatterns += [
@@ -60,7 +63,7 @@ router.register(r'trackevents', tracking_views.TrackingViewSet, 'trackevents')
 router.register(r'pingtracking', tracking_views.PingTracking, 'pingtracking')
 router.register(r'pingterminalexport', terminal_export_views.PingTerminalExport, 'pingterminalexport')
 router.register(r'terminalexportevents', terminal_export_views.TerminalExportViewSet, 'terminalexportevents')
-
+router.register(r'contpicsevents', contpics_views.ContPicsViewSet, 'contpicsevents')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
