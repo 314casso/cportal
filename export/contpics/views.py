@@ -26,7 +26,7 @@ def ping_contpics(request, start_date):
     end_date = start_date.replace(day=calendar.monthrange(start_date.year, start_date.month)[1]) 
     job = contpics_task.delay(request.user, company, start_date, end_date)
     
-    key = u'last_ping_contpics_%s_%s' % (request.user.pk, start_date)
+    key = u'service_contpics_%s_%s' % (request.user.pk, start_date)
     if cache.get(key):
         return JsonResponse({'job': 'cached'})
     cache.set(key, today, 3600*12)     
