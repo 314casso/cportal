@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import traceback
 
 from django.core.files.base import ContentFile
 
@@ -23,5 +24,6 @@ class ContpicsService(SudsService):
                     event.status = nutep.models.DateQueryEvent.SUCCESS                                                           
             event.status = nutep.models.DateQueryEvent.SUCCESS
             event.save()
-        except Exception, e:            
-            self.log_event_error(e, event)
+        except Exception, e:
+            tb = traceback.format_exc()
+            self.log_event_error(e, event, tb)
