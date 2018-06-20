@@ -53,7 +53,7 @@
                               <div class="panel panel-default">
                                 <div class="panel-heading">Обновлено <% item.date | moment %></div>
                                 <div class="panel-body">                                  
-                                  <div v-for="file in item.files" class="list-group" style="margin-bottom: 0"> 
+                                  <div v-for="file in item.files" class="list-group"> 
                                       <a href="#" class="list-group-item list-group-item-info" v-on:click="open(file.file)"><i class="fa fa-save"></i> <strong><% file.title | upper %></strong></a>
                                   </div>
                                 </div>

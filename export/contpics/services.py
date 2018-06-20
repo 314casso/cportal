@@ -19,7 +19,7 @@ class ContpicsService(SudsService):
                 if response:
                     for f in response.pictures:
                         file_data = base64.b64decode(f.data)
-                        filename = u'%s-%s-%s.%s' %  (company, start_date, end_date, 'zip')
+                        filename = u'%s-%s-%s.%s' %  (f.name, start_date, end_date, 'zip')
                         file_store = event.files.create(title=filename)             
                         file_store.file.save(filename, ContentFile(file_data))                    
             event.status = nutep.models.DateQueryEvent.SUCCESS
