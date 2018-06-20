@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 import nutep.models
 import tracking.models as models
 from nutep.services import BaseEventService
-from zeep import  helpers
+from zeep import helpers
 
 
 class TrackingService(BaseEventService):

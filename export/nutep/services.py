@@ -13,6 +13,39 @@ from nutep.models import (REVISE, TERMINAL_EXPORT, TRACKING, BaseError,
                           DateQueryEvent, Employee)
 from nutep.odata import CRM, Portal
 
+import base64
+import suds
+from suds.transport.https import HttpAuthenticated
+
+
+class SudsService(object):
+    username = None
+    password = None
+    url = None
+    def __init__(self, settings):
+        self.set_client(settings)
+
+    def set_client(self, settings):
+        for key in settings.iterkeys():
+            setattr(self, key, settings.get(key))
+        base64string = base64.encodestring(
+            '%s:%s' % (self.username, self.password)).replace('\n', '')
+        authenticationHeader = {
+            "SOAPAction" : "ActionName",
+            "Authorization" : "Basic %s" % base64string
+        }
+        t = HttpAuthenticated(username=self.username, password=self.password)
+        self._client = suds.client.Client(self.url, headers=authenticationHeader, transport=t, cache=suds.cache.NoCache(), timeout=500)
+    
+    def log_event_error(self, e, event, data=None):
+        base_error = BaseError()
+        base_error.content_object = event
+        base_error.type = BaseError.UNKNOWN
+        base_error.message = u'%s\n%s' % (e, data)
+        base_error.save()  
+        event.status = DateQueryEvent.ERROR
+        event.save()  
+
 
 class WSDLService(object):
     username = None

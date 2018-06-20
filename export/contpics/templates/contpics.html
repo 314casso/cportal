@@ -47,18 +47,19 @@
                                   <button type="submit" class="btn btn-primary">Отправить</button>
                                   </span>
                               </div>                        
-                          </form>
-                        
-                        <div class="panel panel-default">
-                          <div class="panel-heading">Обновлено <% updated | moment %></div>
-                          <div class="panel-body">
+                          </form>                                           
+                          
                             <div v-for="item in items"> 
-                              <div v-for="file in item.files" class="list-group"> 
-                                  <a href="#" class="list-group-item list-group-item-info" v-on:click="open(file.file)"><i class="fa fa-save"></i> <strong><% file.title | upper %></strong></a>
+                              <div class="panel panel-default">
+                                <div class="panel-heading">Обновлено <% item.date | moment %></div>
+                                <div class="panel-body">                                  
+                                  <div v-for="file in item.files" class="list-group" style="margin-bottom: 0"> 
+                                      <a href="#" class="list-group-item list-group-item-info" v-on:click="open(file.file)"><i class="fa fa-save"></i> <strong><% file.title | upper %></strong></a>
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-                          </div>
-                        </div>
+                            </div>                          
+                        
                         <div v-if="error" class="alert alert-danger">
                             <strong>Ошибка!</strong>
                             <% error %>

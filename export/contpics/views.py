@@ -39,4 +39,4 @@ class ContPicsViewSet(viewsets.ModelViewSet):
         q = nutep.models.DateQueryEvent.objects.for_user(
             self.request.user).filter(type=nutep.models.CONTPICS)
         q = q.exclude(status__in=(nutep.models.DateQueryEvent.PENDING, nutep.models.DateQueryEvent.ERROR))
-        return q.order_by('-date')[:30]    
+        return q.order_by('-date')[:20]
