@@ -5,8 +5,7 @@ var appContpics = new Vue({
     data: {
         items: [],
         loading: false,
-        error: '',
-        updated: null
+        error: ''
     },
     delimiters: ["<%", "%>"],
     mounted() {			
@@ -34,10 +33,7 @@ var appContpics = new Vue({
             xhr.onload = function () {
                 try {
                     var data = JSON.parse(xhr.responseText, utils.reviver);
-                    self.items = data;
-                    if (self.items) {
-                        self.updated = self.items[0].date;
-                    }						
+                    self.items = data;                    
                 } catch (e) {
                     self.error = "Произошла ошибка обновления данных: " + e;
                 }
