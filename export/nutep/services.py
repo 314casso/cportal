@@ -44,7 +44,7 @@ class SudsService(object):
         base_error.message = u'%s\n%s' % (e, data)
         base_error.save()  
         event.status = DateQueryEvent.ERROR
-        event.save()  
+        event.save()
 
 
 class WSDLService(object):
@@ -60,7 +60,7 @@ class WSDLService(object):
         
         session = Session()
         session.auth = HTTPBasicAuth(self.username, self.password)         
-        self._client = Client(self.url, strict=False, transport=Transport(session=session, timeout=500))  
+        self._client = Client(self.url, strict=False, xml_huge_tree=True, transport=Transport(session=session, timeout=500))  
 
 
 class DealService(WSDLService):    

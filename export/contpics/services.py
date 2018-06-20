@@ -6,10 +6,10 @@ import traceback
 from django.core.files.base import ContentFile
 
 import nutep.models
-from nutep.services import SudsService
+from nutep.services import SudsService, BaseEventService
 
 
-class ContpicsService(SudsService):
+class ContpicsService(BaseEventService):
     def run(self, user, company, start_date, end_date):
         try:            
             event = nutep.models.DateQueryEvent.objects.create(user=user, type=nutep.models.CONTPICS, 
@@ -17,8 +17,8 @@ class ContpicsService(SudsService):
             if company.ukt_guid:         
                 response = self._client.service.getClientPicturesZip(company.ukt_guid, start_date, end_date)                                   
                 if response:
-                    for f in response.pictures:
-                        file_data = base64.b64decode(f.data)
+                    for f in response:
+                        file_data = f.data
                         filename = u'%s-%s-%s.%s' %  (f.name, start_date, end_date, 'zip')
                         file_store = event.files.create(title=filename)             
                         file_store.file.save(filename, ContentFile(file_data))                    
