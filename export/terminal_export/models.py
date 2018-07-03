@@ -10,6 +10,7 @@ from nutep.models import DateQueryEvent, Nomenclature
 class Container(BaseContainer):
     emptyweight = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
     seal = models.CharField(max_length=150, blank=True, null=True)
+    datein = models.DateField(blank=True, null=True)
     
 
 class Stuffing(models.Model):

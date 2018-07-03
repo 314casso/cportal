@@ -61,6 +61,11 @@ var utils = {
             return moment(date).format('DD.MM.YY');
         }
     },
+    date: function date(_date) {
+        if (_date) {
+            return moment(_date).format('DD.MM.YYYY');
+        }
+    },
     moment: function (_moment) {
         function moment(_x) {
             return _moment.apply(this, arguments);

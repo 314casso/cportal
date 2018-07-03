@@ -9,4 +9,9 @@ from terminal_export.services import TerminalExportService
 def terminal_export_task(user):            
     service = TerminalExportService(WEB_SERVISES['cp'])
     service.get_export(user)      
-                                      
+
+
+@job(BASE_RQ_PROC)
+def empty_stock_task(user):            
+    service = TerminalExportService(WEB_SERVISES['cp'])
+    service.get_empty_stock(user)                                            

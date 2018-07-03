@@ -52,3 +52,36 @@ class TerminalExportService(BaseEventService):
         except Exception, e:
             tb = traceback.format_exc()
             self.log_event_error(e, event, tb)
+
+    def get_empty_stock(self, user):
+        try:
+            company = user.companies.filter(
+                membership__is_general=True).first()
+            event = nutep.models.DateQueryEvent.objects.create(
+                user=user, type=nutep.models.EMPTY_STOCK, status=nutep.models.DateQueryEvent.PENDING, company=company)
+            nomenclature = company.nomencls.filter(is_general=True).first()
+            if not nomenclature:
+                return
+            response = self._client.service.EmptyStock(
+                nomenclature.nomenclature.ukt_guid)
+            if hasattr(response, 'report') and response.report:
+                file_data = response.report[0].data
+                filename = u'%s-%s-%s.%s' % (company, 'emptystock', nomenclature.nomenclature.name, 'xlsx')
+                file_store = event.files.create(title=filename)
+                file_store.file.save(filename, ContentFile(file_data))
+                event.status = nutep.models.DateQueryEvent.SUCCESS
+            if hasattr(response, 'row') and response.row:
+                for datarow in response.row:
+                    terminal_export = models.TerminalExport.objects.create(
+                        event=event, rowindex=datarow['rowindex'], nomenclature=nomenclature.nomenclature)
+                    container_dict = helpers.serialize_object(datarow['container'])
+                    container = models.Container()
+                    set_properties(container, container_dict, ['stuffs', 'seal', 'emptyweight'])                    
+                    container.save()                                                            
+                    terminal_export.container = container
+                    terminal_export.save()  
+            event.status = nutep.models.DateQueryEvent.SUCCESS
+            event.save()
+        except Exception, e:
+            tb = traceback.format_exc()
+            self.log_event_error(e, event, tb)

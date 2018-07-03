@@ -52,12 +52,14 @@ REVISE = 1
 TRACKING = 2
 TERMINAL_EXPORT = 3
 CONTPICS = 4
+EMPTY_STOCK = 5
 
 TYPE_CHOICES = (
     (REVISE, u'Взаиморасчеты'),
     (TRACKING, u'Слежение'),
     (TERMINAL_EXPORT, u'Экспорт на терминале'),
     (CONTPICS, u'Фото контейнеров'),
+    (EMPTY_STOCK, u'Сток порожних'),
 )    
 
 class DateQueryEvent(models.Model):

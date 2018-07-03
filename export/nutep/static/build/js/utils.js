@@ -54,6 +54,11 @@ const utils = {
         if (date) {
             return moment(date).format('DD.MM.YY');
         }
+    },
+    date: (date) => {
+        if (date) {
+            return moment(date).format('DD.MM.YYYY');
+        }
     },    
     moment: (date) => {
         if (date) {

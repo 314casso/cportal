@@ -35,6 +35,7 @@ urlpatterns += [
     url(r'^terminalexport/$', terminal_export_views.TerminalExportView.as_view(), name='terminalexport'),
     url(r'^contpics/$', contpics_views.DashboardView.as_view(), name='contpics'),
     url(r'pingcontpics/(?P<start_date>\d{8})/$', contpics_views.ping_contpics, name='pingcontpics'),
+    url(r'^emptystock/$', terminal_export_views.EmptyStockView.as_view(), name='emptystock'),
 ]
 
 urlpatterns += [
@@ -64,6 +65,9 @@ router.register(r'pingtracking', tracking_views.PingTracking, 'pingtracking')
 router.register(r'pingterminalexport', terminal_export_views.PingTerminalExport, 'pingterminalexport')
 router.register(r'terminalexportevents', terminal_export_views.TerminalExportViewSet, 'terminalexportevents')
 router.register(r'contpicsevents', contpics_views.ContPicsViewSet, 'contpicsevents')
+router.register(r'pingemptystock', terminal_export_views.PingEmptyStock, 'pingemptystock')
+router.register(r'emptystockevents', terminal_export_views.EmptyStockViewSet, 'emptystockevents')
+
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
