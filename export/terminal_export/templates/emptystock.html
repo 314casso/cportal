@@ -94,6 +94,11 @@
                             </div>
 
                             <div class="input-group">
+                              <span class="input-group-addon">Терминал</span>
+                              <v-select v-model='filter.terminal' multiple :options="filterOptions.terminals"></v-select>
+                            </div>
+
+                            <div class="input-group">
                               <span class="input-group-addon">Дата</span>                              
                               
                               <vuejs-datepicker input-class="form-control" :format="customFormatter" :highlighted="highlighted" 
@@ -167,6 +172,7 @@
                                   <th>Размер</th>
                                   <th>Тип</th>
                                   <th>Линия</th>
+                                  <th>Терминал</th>
                                   <th>Дата <i class="fa fa-fw fa-sort-asc"></i></th>
                                 </tr>                                
                               </thead>
@@ -178,6 +184,7 @@
                                   <td><% row.container.size %></td>
                                   <td><% row.container.type %></td>                                
                                   <td><% row.container.line %></td>
+                                  <td><% row.container.terminal %></td>
                                   <td><% row.container.datein | date %></td>
                                 </tr>                                         
                               </tbody>
@@ -202,8 +209,6 @@
   <script src="/static/vendors/vue/vue.min.js"></script>    
   <script src="/static/vendors/vue-select/dist/vue-select.js"></script>    
   <script src="/static/vendors/vuejs-datepicker/build.min.js"></script>    
-  <script src="/static/build/dist/app/emptystock.min.js?0.0.5"></script>
-  <!--<script src="/static/build/js/app/emptystock.js?0.0.3" type="module"></script>-->
- 
-
+  <script src="/static/build/dist/app/emptystock.min.js?0.0.6"></script>
+  <!--<script src="/static/build/js/app/emptystock.js?0.0.4" type="module"></script>-->
 {% endblock javascripts %}

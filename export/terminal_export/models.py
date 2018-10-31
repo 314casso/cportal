@@ -12,6 +12,7 @@ class Container(BaseContainer):
     seal = models.CharField(max_length=150, blank=True, null=True)
     datein = models.DateField(blank=True, null=True)
     contract = models.CharField(max_length=150, blank=True, null=True)
+    terminal = models.CharField(max_length=150, blank=True, null=True)
     
 
 class Stuffing(models.Model):
