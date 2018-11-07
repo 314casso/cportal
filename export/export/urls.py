@@ -10,6 +10,7 @@ from nutep import views as nutep_views
 from terminal_export import views as terminal_export_views
 from tracking import views as tracking_views
 from contpics import views as contpics_views
+from contract import views as contract_views
 
 
 admin.autodiscover()
@@ -36,6 +37,10 @@ urlpatterns += [
     url(r'^contpics/$', contpics_views.DashboardView.as_view(), name='contpics'),
     url(r'pingcontpics/(?P<start_date>\d{8})/$', contpics_views.ping_contpics, name='pingcontpics'),
     url(r'^emptystock/$', terminal_export_views.EmptyStockView.as_view(), name='emptystock'),
+    url(r'pingcontracts/$', contract_views.ping_contacts, name='pingcontracts'), 
+    url(r'^contracts/$', contract_views.DashboardView.as_view(), name='contracts'),       
+    url(r'pingcontractfiles/(?P<pk>\d+)/$', contract_views.ping_files, name='pingcontractfiles'), 
+    url(r'^getfileurl/(?P<guid>.*)/$', nutep_views.get_file_url, name='getfileurl'),
 ]
 
 urlpatterns += [
@@ -67,6 +72,8 @@ router.register(r'terminalexportevents', terminal_export_views.TerminalExportVie
 router.register(r'contpicsevents', contpics_views.ContPicsViewSet, 'contpicsevents')
 router.register(r'pingemptystock', terminal_export_views.PingEmptyStock, 'pingemptystock')
 router.register(r'emptystockevents', terminal_export_views.EmptyStockViewSet, 'emptystockevents')
+router.register(r'contracts', contract_views.ContractViewSet, 'contracts')
+router.register(r'contractfiles', contract_views.ContractFileViewSet, 'contractfiles')
 
 
 # Wire up our API using automatic URL routing.

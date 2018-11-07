@@ -10,7 +10,7 @@ from zeep.transports import Transport
 
 from export.local_settings import WEB_SERVISES
 from nutep.models import (REVISE, TERMINAL_EXPORT, TRACKING, BaseError,
-                          DateQueryEvent, Employee)
+                          DateQueryEvent, Employee, File)
 from nutep.odata import CRM, Portal
 
 import base64
@@ -148,3 +148,16 @@ class PortalService(object):
                 ext = 'jpg'
                 imagedata = ContentFile(base64.b64decode(imagedata), name='avatar.' + ext)
                 employee.image.save('avatar.jpg', imagedata)           
+
+
+class AttachedFileService(SudsService):
+    def get_attachement(self, user, file_guid):
+        file_store = File.objects.filter(guid=file_guid).last()
+        if not file_store:
+            return
+        xml_attachment = self._client.service.GetAttachedFile(file_store.guid, file_store.storage)
+        if xml_attachment:
+            data = base64.b64decode(xml_attachment.data)
+            filename = u'%s.%s' %  (file_store.title, file_store.extension)
+            file_store.file.save(filename, ContentFile(data))
+        return file_store

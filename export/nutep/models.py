@@ -53,6 +53,8 @@ TRACKING = 2
 TERMINAL_EXPORT = 3
 CONTPICS = 4
 EMPTY_STOCK = 5
+CONTRACTS = 6
+CONTRACT_FILES = 7
 
 TYPE_CHOICES = (
     (REVISE, u'Взаиморасчеты'),
@@ -60,6 +62,8 @@ TYPE_CHOICES = (
     (TERMINAL_EXPORT, u'Экспорт на терминале'),
     (CONTPICS, u'Фото контейнеров'),
     (EMPTY_STOCK, u'Сток порожних'),
+    (CONTRACTS, u'Контракты'),
+    (CONTRACT_FILES, u'Файлы по контракту'),
 )    
 
 class DateQueryEvent(models.Model):
@@ -95,6 +99,11 @@ class File(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     title = models.CharField(blank=True, null=True, max_length=255)    
     file = models.FileField(upload_to=attachment_path, blank=True, null=True,)
+    guid = models.CharField(blank=True, null=True, max_length=36)
+    storage = models.CharField(blank=True, null=True, max_length=150)
+    doc_type = models.CharField(max_length=100, blank=True, null=True,)
+    extension = models.CharField(max_length=10, blank=True, null=True)
+    size = models.IntegerField(blank=True, null=True)
     def __unicode__(self):
         return u'{0}'.format(self.title)
 

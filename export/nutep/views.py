@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import division
 
 import datetime
@@ -11,7 +10,7 @@ import django_rq
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_unicode
@@ -22,14 +21,14 @@ from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from nutep.forms import ReviseForm, TrackingForm
-from nutep.models import (REVISE, TERMINAL_EXPORT, TRACKING, Company,
-                          DateQueryEvent, News)
-from nutep.serializers import (DateQueryReviseSerializer,                               
-                               EmployeesSerializer, EventStatusSerializer,
-                               NewsSerializer, UserSerializer)
-from nutep.tasks import revise_task
 from export.settings import BASE_RQ_PROC
+from nutep.forms import ReviseForm, TrackingForm
+from nutep.models import Company, DateQueryEvent, News, REVISE, \
+    TERMINAL_EXPORT, TRACKING
+from nutep.serializers import DateQueryReviseSerializer, EmployeesSerializer, \
+    EventStatusSerializer, NewsSerializer, UserSerializer
+from nutep.tasks import get_attachement, revise_task
+
 
 logger = logging.getLogger('django.request')
 
@@ -192,3 +191,11 @@ class NewsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):        
         q = News.objects.all()
         return q[:self.limit]
+
+
+def get_file_url(request, guid):
+    file_store = get_attachement(request, guid)
+    url = '#'
+    if file_store.file:
+        url = file_store.file.url
+    return JsonResponse({'url':  url})

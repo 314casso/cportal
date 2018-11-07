@@ -174,6 +174,7 @@ INSTALLED_APPS = (
     'terminal_export',
     'tracking',
     'contpics',
+    'contract',
     'django.contrib.admin',    
     'easy_thumbnails',
     'django_select2',
