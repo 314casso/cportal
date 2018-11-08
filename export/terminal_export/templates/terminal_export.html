@@ -40,7 +40,7 @@
                     <div v-for="item in items" v-cloak>                      
                       <div class="clearfix"></div>
                       <!-- -->                      
-                      <div class="col-md-5 col-sm-5 col-xs-12">
+                      <div class="col-md-6 col-sm-6 col-xs-12">
                       
                         <div v-if="error" class="alert alert-danger">
                           <strong>Ошибка!</strong>
@@ -94,9 +94,14 @@
                             </div>
 
                             <div class="input-group">
-                                    <span class="input-group-addon">Контракт</span>
-                                    <v-select v-model='filter.contract' multiple :options="filterOptions.contracts"></v-select>
-                                  </div>
+                              <span class="input-group-addon">Контракт</span>
+                              <v-select v-model='filter.contract' multiple :options="filterOptions.contracts"></v-select>
+                            </div>
+
+                            <div class="input-group">
+                                <span class="input-group-addon">Терминал</span>
+                                <v-select v-model='filter.terminal' multiple :options="filterOptions.terminals"></v-select>
+                              </div>
 
                             <div class="input-group">
                               <span class="input-group-addon">Дата приема порожнего</span>                              
@@ -128,7 +133,7 @@
                             <div class="panel-heading">
                                 
                               <label class="label label-default"><% stats.total_rows %></label>&nbsp;
-                              <strong>Список экспортных контейнеров на терминале</strong>                                     
+                              <strong>Список экспортных контейнеров</strong>                                     
                               <div class="pull-right">
                                   <label class="label label-info" title="Дата обновления информации">
                                       <% item.date | moment %>
@@ -148,6 +153,7 @@
                                         <th>Тип</th>
                                         <th>Линия</th>
                                         <th>Контракт</th>
+                                        <th>Терминал</th>
                                     </tr>                                
                                     </thead>
                                     <tbody>                                                                             
@@ -159,6 +165,7 @@
                                         <td><% row.container.type %></td>                                
                                         <td><% row.container.line %></td>
                                         <td><% row.container.contract %></td>
+                                        <td><% row.container.terminal %></td>
                                     </tr>                                         
                                     </tbody>
                                 </table>
@@ -191,7 +198,7 @@
                       <!-- -->
 
                       <!-- -->
-                      <div class="col-md-7 col-sm-7 col-xs-12" v-if="currentItem">
+                      <div class="col-md-6 col-sm-6 col-xs-12" v-if="currentItem">
                             <div class="panel panel-default">
                                 <div class="panel-heading"><i class="fa fa-info-circle"></i> <strong><% currentItem.container.number %></strong> 
                                   <div class="pull-right">
@@ -247,7 +254,13 @@
                                               <td>
                                                   <% container.seal %>
                                               </td>
-                                          </tr>                                                                                                                        
+                                          </tr>
+                                          <tr>
+                                              <th>Дата приема порожнего</th>
+                                              <td>
+                                                  <% container.datein | shortdate %>
+                                              </td>
+                                          </tr>
                                       </tbody>                                                                         
                                       
                                          <tbody v-for="(stuff, index) in currentItem.container.stuffs">
@@ -314,7 +327,7 @@
   <script src="/static/vendors/vue/vue.min.js"></script>    
   <script src="/static/vendors/vue-select/dist/vue-select.js"></script>    
   <script src="/static/vendors/vuejs-datepicker/build.min.js"></script>    
-  <script src="/static/build/dist/app/terminal_export.min.js?0.0.2"></script>
+  <script src="/static/build/dist/app/terminal_export.min.js?0.0.3"></script>
   <!--<script src="/static/build/js/app/terminal_export.js?0.0.6" type="module"></script>-->
  
 

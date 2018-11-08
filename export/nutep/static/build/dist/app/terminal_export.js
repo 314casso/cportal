@@ -25,7 +25,8 @@ var appTerminalExport = new Vue({
             type: [],
             line: [],
             date: null,
-            contract: []
+            contract: [],
+            terminal: []
         },
         highlighted: {
             dates: [new Date()]
@@ -39,14 +40,15 @@ var appTerminalExport = new Vue({
 
     computed: {
         isFiltered: function isFiltered() {
-            return this.filter.number || this.filter.size.length || this.filter.type.length || this.filter.line.length || this.filter.date || this.filter.contract.length;
+            return this.filter.number || this.filter.size.length || this.filter.type.length || this.filter.line.length || this.filter.date || this.filter.contract.length || this.filter.terminal.length;
         },
         filterOptions: function filterOptions() {
             var result = {
                 sizes: [],
                 lines: [],
                 types: [],
-                contracts: []
+                contracts: [],
+                terminals: []
             };
             if (this.items.length == 0) {
                 return result;
@@ -57,6 +59,7 @@ var appTerminalExport = new Vue({
             var types = new Set();
             var lines = new Set();
             var contracts = new Set();
+            var terminals = new Set();
             rows.forEach(function (elem, i, arr) {
                 if (elem.container) {
                     sizes.add(elem.container.size);
@@ -65,12 +68,14 @@ var appTerminalExport = new Vue({
                     if (elem.container.contract) {
                         contracts.add(elem.container.contract);
                     }
+                    terminals.add(elem.container.terminal);
                 }
             });
             result.sizes = Array.from(sizes);
             result.lines = Array.from(lines);
             result.types = Array.from(types);
             result.contracts = Array.from(contracts);
+            result.terminals = Array.from(terminals);
             return result;
         }
     },
@@ -124,6 +129,7 @@ var appTerminalExport = new Vue({
             this.filter.type = [];
             this.filter.line = [];
             this.filter.contract = [];
+            this.filter.terminal = [];
             this.filter.date = null;
         },
         setCurrentItem: function setCurrentItem(item) {
@@ -164,6 +170,9 @@ var appTerminalExport = new Vue({
                         return false;
                     }
                     if (self.filter.contract.length && !self.filter.contract.includes(row.container.contract)) {
+                        return false;
+                    }
+                    if (self.filter.terminal.length && !self.filter.terminal.includes(row.container.terminal)) {
                         return false;
                     }
                     if (self.filter.date && !(moment(self.filter.date).format('YYYY-MM-DD') == row.container.datein)) {
