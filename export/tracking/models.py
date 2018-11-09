@@ -8,7 +8,7 @@ from nutep.models import DateQueryEvent
 
 
 class Container(BaseContainer):
-    pass
+    contract = models.CharField(max_length=50, db_index=True, blank=True, null=True)
 
 
 class Platform(models.Model):
