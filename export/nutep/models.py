@@ -55,6 +55,8 @@ CONTPICS = 4
 EMPTY_STOCK = 5
 CONTRACTS = 6
 CONTRACT_FILES = 7
+ORDER_LIST = 8
+ORDER_DATA = 9
 
 TYPE_CHOICES = (
     (REVISE, u'Взаиморасчеты'),
@@ -64,6 +66,8 @@ TYPE_CHOICES = (
     (EMPTY_STOCK, u'Сток порожних'),
     (CONTRACTS, u'Контракты'),
     (CONTRACT_FILES, u'Файлы по контракту'),
+    (ORDER_LIST, u'Список сделок'),
+    (ORDER_DATA, u'Данные сделки'),
 )    
 
 class DateQueryEvent(models.Model):

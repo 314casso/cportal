@@ -14,7 +14,7 @@ var utils = {
         }
         return value;
     },
-    checkJob: function checkJob(job, app) {
+    checkJob: function checkJob(job, app, jobSuccess) {
         app.loading = true;
         var xhr = new XMLHttpRequest();
         if (!job) {
@@ -29,13 +29,17 @@ var utils = {
                 app.error = "Произошла ошибка обновления данных: " + e;
             }
             if (resp.job == 'started') {
-                setTimeout(utils.checkJob, 1000, job, app);
+                setTimeout(utils.checkJob, 1000, job, app, jobSuccess);
             } else {
                 app.loading = false;
                 if (resp.job == 'failed') {
                     app.error = "Произошла ошибка обновления данных";
                 } else {
-                    app.jobSuccess();
+                    if (jobSuccess) {
+                        jobSuccess();
+                    } else {
+                        app.jobSuccess();
+                    }
                 }
             }
         };
@@ -45,13 +49,13 @@ var utils = {
         };
         xhr.send();
     },
-    pingData: function pingData(url, app) {
+    pingData: function pingData(url, app, jobSuccess) {
         var xhr = new XMLHttpRequest();
         app.loading = true;
         xhr.open('GET', url);
         xhr.onload = function () {
             var resp = JSON.parse(xhr.responseText);
-            utils.checkJob(resp.job, app);
+            utils.checkJob(resp.job, app, jobSuccess);
         };
         xhr.send();
     },

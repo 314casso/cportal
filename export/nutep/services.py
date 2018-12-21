@@ -41,7 +41,7 @@ class SudsService(object):
         base_error = BaseError()
         base_error.content_object = event
         base_error.type = BaseError.UNKNOWN
-        base_error.message = u'%s\n%s' % (e, data)
+        base_error.message = data
         base_error.save()  
         event.status = DateQueryEvent.ERROR
         event.save()

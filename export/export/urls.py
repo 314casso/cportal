@@ -41,6 +41,9 @@ urlpatterns += [
     url(r'^contracts/$', contract_views.DashboardView.as_view(), name='contracts'),       
     url(r'pingcontractfiles/(?P<pk>\d+)/$', contract_views.ping_files, name='pingcontractfiles'), 
     url(r'^getfileurl/(?P<guid>.*)/$', nutep_views.get_file_url, name='getfileurl'),
+    url(r'pingorders/$', contract_views.ping_orders, name='pingorders'), 
+    url(r'pingorderdata/(?P<pk>\d+)/$', contract_views.ping_order_data, name='pingorderdata'),     
+    url(r'^orderlist/$', contract_views.OrderListDashboardView.as_view(), name='orderlist'),       
 ]
 
 urlpatterns += [
@@ -74,6 +77,8 @@ router.register(r'pingemptystock', terminal_export_views.PingEmptyStock, 'pingem
 router.register(r'emptystockevents', terminal_export_views.EmptyStockViewSet, 'emptystockevents')
 router.register(r'contracts', contract_views.ContractViewSet, 'contracts')
 router.register(r'contractfiles', contract_views.ContractFileViewSet, 'contractfiles')
+router.register(r'clientorders', contract_views.OrderViewSet, 'clientorders')
+router.register(r'orderdata', contract_views.OrderDataViewSet, 'orderdata')
 
 
 # Wire up our API using automatic URL routing.

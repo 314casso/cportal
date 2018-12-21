@@ -1,0 +1,415 @@
+{% extends "app/base_site.html" %}
+
+{% block title %}{% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}  
+  <style>
+      .v-select .dropdown-toggle {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+      }      
+  </style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="right_col" role="main">
+
+    <div class="row">
+                 
+        <div class="clearfix"></div>
+        
+        <div class="x_content">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>{{ service }}</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>                  
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content" id="app-terminal-export" v-cloak>                       
+                    <div v-if="loading" class='cssload-jumping'><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="clearfix"></div>                      
+                    
+                      <div class="clearfix"></div>
+                      <!-- -->                      
+                      <div class="col-md-12 col-sm-12 col-xs-12">
+                      
+                        <div v-if="error" class="alert alert-danger">
+                          <strong>Ошибка!</strong>
+                          <% error %>
+                        </div>
+                      
+                        <div class="clearfix"></div>
+                      
+                       <div v-for="item in items" v-cloak>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                
+                              <label class="label label-default"><% paginate.count %></label>&nbsp;
+                              <strong>Список заявок
+                              </strong>                                     
+                              <div class="pull-right">
+                                  <label class="label label-info" title="Дата обновления информации">
+                                      <% item.date | moment %>
+                                  </label>
+                              </div>
+                            </div>
+                            <div class="panel-body">  
+
+
+                              <!-- -->  
+
+                     <div class="panel panel-default">
+                        <div class="panel-heading">
+                          <i class="fa fa-search"></i>
+                          <strong>Поиск по заявкам</strong>                                                                                    
+  
+                          <div class="pull-right">
+                              <span title="Отобрано строк" v-if="isFiltered">
+                                  <label class="label label-warning">
+                                      <% stats.total_rows %>
+                                    </label>
+                              </span>
+                              <span title="Всего строк" v-else>
+                                  <label class="label label-success">
+                                      <% stats.total_rows %>
+                                    </label>
+                              </span>                                                     
+                            </div>                            
+  
+                        </div>
+                        <div class="panel-body">
+                                                                                     
+  
+                          <div class="input-group">
+                            <span class="input-group-addon">Заявка</span>
+                            <input v-model='filter.name' type="search" class="form-control" name="search" autocomplete="off">
+                            <span class="input-group-btn">
+                              <button class="btn btn-default" v-on:click="clearSearch" type="button">
+                                <i class="glyphicon glyphicon-remove"></i>
+                              </button>
+                            </span>
+                          </div>
+                                
+                          <div class="input-group">
+                              <span class="input-group-addon">Контракт</span>
+                              <input v-model='filter.contract' type="search" class="form-control" name="contract" autocomplete="off">
+                              <span class="input-group-btn">
+                                <button class="btn btn-default" v-on:click="clearContract" type="button">
+                                  <i class="glyphicon glyphicon-remove"></i>
+                                </button>
+                              </span>
+                            </div>
+  
+                            <div class="input-group">
+                                <span class="input-group-addon">Поиск в подсыле порожних</span>
+                                <input v-model='filter.platform' type="search" class="form-control" name="platform" autocomplete="off">
+                                <span class="input-group-btn">
+                                  <button class="btn btn-default" v-on:click="clearPlatform" type="button">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                  </button>
+                                </span>
+                              </div>
+  
+                              <div class="input-group">
+                                  <span class="input-group-addon">Поиск в отгрузке</span>
+                                  <input v-model='filter.perepodacha' type="search" class="form-control" name="platform" autocomplete="off">
+                                  <span class="input-group-btn">
+                                    <button class="btn btn-default" v-on:click="clearPerepodacha" type="button">
+                                      <i class="glyphicon glyphicon-remove"></i>
+                                    </button>
+                                  </span>
+                                </div>
+  
+  
+                          <div class="clearfix"></div>
+  
+                          <div v-if="isFiltered">
+                            <button class="btn btn-primary" v-on:click="clearFilter" type="button">
+                              <i class="glyphicon glyphicon-remove"></i> Очистить фильтр 
+                            </button>
+                          </div>
+  
+                        </div>
+                    
+                      </div>
+                        
+                        <!-- -->
+                  
+
+                            <div v-if="paginate.count">
+
+                                 <paginate 
+                                    v-model="paginate.page"
+                                    :page-count="paginate.pageCount"                
+                                    :container-class="'pagination'"
+                                    :prev-text="'&#8592;'"
+                                    :next-text="'&#8594;'"
+                                    :click-handler="clickCallback">
+                                  </paginate>
+                      
+
+                              <table class="table table-hover">
+                                <thead>                                                              
+                                  <tr>
+                                    <th width="30">&nbsp;</th>                                                                        
+                                    <th>Наименование</th>
+                                    <th>Дата</th>                                    
+                                    <th>Контракты</th>
+                                  </tr>                                
+                                </thead>
+                                <tbody>                                                                                                               
+                                  <tr v-if="row" role="button" class="datarow" v-for="(row, index) in orderlist(item)" :key="row.id"
+                                  v-on:click="selectOrder(row)">                                  
+                                    <td><i v-bind:class="{'glyphicon glyphicon-play': row.id == selectedOrder.id }"></i></td>
+                                    <th scope="row"><% row.name %></th>
+                                    <td><% row.date | shortdate %></td>
+                                    <td><span v-for="contract in row.contracts">
+                                            <label class="label label-info"><% contract.name %></label>&nbsp;
+                                    </span></td>
+                                  </tr>                                         
+                                </tbody>
+                              </table>
+                            </div>                       
+                        </div>                      
+                    </div>
+                    </div>
+
+                    <div class="clearfix"></div>
+                    
+                  <div class="panel panel-default" v-if="selectedOrder">
+                        <div class="panel-heading">
+                          <i class="fa fa-train"></i>
+                          <strong><% selectedOrder.name %></strong>  
+                          <div class="pull-right">
+                          <label class="label label-default"><% selectedOrder.data.zddata.train %></label>
+                          <label class="label label-info"><% selectedOrder.data.zddata.stationout %> - <% selectedOrder.data.zddata.stationarrival %></label>  
+                          </div>
+                          
+
+                        </div>
+                   <div class="panel-body">
+                                         
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                      <div class="panel panel-default">
+                          <div class="panel-heading">
+                            <i class="fa fa-train"></i>
+                            <strong>Рейсы</strong>                                                                                    
+                          </div>
+                          <div class="panel-body">
+                            
+                              <table class="table table-hover" v-if="selectedOrder.data.voyages.length > 0"> 
+                                  <thead>                                                              
+                                    <tr>                                    
+                                      <th width="200">Рейс</th>
+                                      <th>Судно</th>                                                                        
+                                    </tr>                                
+                                  </thead>
+                                  <tbody>  
+                                                                                                          
+                                    <tr v-if="voyage" role="button" class="datarow" v-for="voyage in selectedOrder.data.voyages" :key="voyage.id">                                                                      
+                                      <th scope="row"><% voyage.name %></th>                                    
+                                      <td>
+                                          <% voyage.shipname %>
+                                      </td>
+                                    </tr>                                         
+                                  </tbody>
+                                </table>                         
+                          </div>                    
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                              <i class="fa fa-train"></i>
+                              <strong>Коносаменты</strong>                                                                                    
+                            </div>
+                            <div class="panel-body">
+                              
+                                <table class="table table-hover" v-if="selectedOrder.data.consignments.length > 0"> 
+                                    <thead>                                                              
+                                      <tr>                                    
+                                        <th width="200">Коносамент</th>
+                                        <th>Рейс</th>                                                                        
+                                      </tr>                                
+                                    </thead>
+                                    <tbody>  
+                                                                                                            
+                                      <tr v-if="consignment" role="button" class="datarow" v-for="consignment in selectedOrder.data.consignments" :key="consignment.id">                                                                      
+                                        <th scope="row"><% consignment.name %></th>                                    
+                                        <td>
+                                            <% consignment.voyage %>
+                                        </td>
+                                      </tr>                                         
+                                    </tbody>
+                                  </table>                         
+                            </div>                    
+                          </div>
+                      </div>                                            
+
+                      <div class="col-md-12 col-sm-12 col-xs-12">
+                          <div class="panel panel-default">
+                              <div class="panel-heading">
+                                <i class="fa fa-train"></i>
+                                <strong>Платформы (подсыл порожних)</strong>
+                              </div>
+                              <div class="panel-body">
+                                
+                                  <table class="table table-hover" v-if="selectedOrder.data.platforms.length > 0"> 
+                                      <thead>                                                              
+                                        <tr>                                    
+                                          <th width="200">Контейнер</th>
+                                          <th>Размер</th>
+                                          <th>Тип</th>
+                                          <th>Линия</th>
+                                          <th>Контракт</th>
+                                          <th>Терминал отправления</th>
+                                          <th>Вагон</th>
+                                          <th>ЖД накладная</th>
+                                          <th>Дата отправления</th>
+                                          <th>Дата прибытия</th>
+                                        </tr>                                
+                                      </thead>
+                                      <tbody>  
+                                        <tr v-if="platform" role="button" class="datarow" v-for="platform in selectedOrder.data.platforms" :key="platform.id">                                                                      
+                                          <th scope="row"><% platform.container %></th>                                    
+                                          <td><% platform.size %></td>
+                                          <td><% platform.type %></td>
+                                          <td><% platform.line %></td>
+                                          <td><% platform.contract %></td>
+                                          <td><% platform.terminalout %></td>
+                                          <td><% platform.vagon %></td>
+                                          <td><% platform.waybill %></td>
+                                          <td><% platform.dateout | shortdate %></td>
+                                          <td><% platform.datearrival | shortdate %></td>
+                                        </tr>                                         
+                                      </tbody>
+                                    </table>                         
+                              </div>                    
+                            </div>
+                       </div>
+
+                       <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                              <i class="fa fa-train"></i>
+                              <strong>Отгрузка (переподача)</strong>
+                            </div>
+                            <div class="panel-body">
+                              
+                                <table class="table table-hover" v-if="selectedOrder.data.perepodacha.length > 0"> 
+                                    <thead>                                                              
+                                      <tr>                                    
+                                        <th width="200">Контейнер</th>
+                                        <th>Размер</th>
+                                        <th>Тип</th>
+                                        <th>Вес</th>
+                                        <th>Линия</th>
+                                        <th>Контракт</th>
+                                        <th>Станция отправления</th>
+                                        <th>Станция назначения</th>
+                                        <th>Вагон</th>
+                                        <th>ЖД накладная</th>
+                                        <th>Дата отправления</th>
+                                        <th>Дата прибытия</th>
+                                      </tr>                                
+                                    </thead>
+                                    <tbody>  
+                                      <tr v-if="platform" role="button" class="datarow" v-for="platform in selectedOrder.data.perepodacha" :key="platform.id">                                                                      
+                                        <th scope="row"><% platform.container %></th>                                    
+                                        <td><% platform.size %></td>
+                                        <td><% platform.type %></td>
+                                        <td><% platform.weight %></td>
+                                        <td><% platform.line %></td>
+                                        <td><% platform.contract %></td>
+                                        <td><% platform.stationout %></td>
+                                        <td><% platform.stationperepodacha %></td>
+                                        <td><% platform.vagon %></td>
+                                        <td><% platform.waybill %></td>
+                                        <td><% platform.dateout | shortdate %></td>
+                                        <td><% platform.datearrival | shortdate %></td>
+                                      </tr>                                         
+                                    </tbody>
+                                  </table>                         
+                            </div>                    
+                          </div>
+                     </div>
+
+                     
+                       <div class="col-md-12 col-sm-12 col-xs-12" v-cloak> 
+                       <div v-for="item in items">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                
+                              <strong>Список файлов по заявке 
+                                  <% selectedOrder.name %>
+                              </strong>                                     
+                              <div class="pull-right">
+                                  <label class="label label-info" title="Дата обновления информации">
+                                      <% item.date | moment %>
+                                  </label>
+                              </div>
+                            </div>
+                            <div class="panel-body">  
+                            
+                              <table class="table table-hover" v-if="selectedOrder.data.files.length > 0">
+                                <thead>                                                              
+                                  <tr>
+                                    <th>&nbsp;</th>
+                                    <th>#</th>
+                                    <th>Наименование</th>
+                                    <th>Размер</th>
+                                    <th>Тип документа</th>                                    
+                                  </tr>                                
+                                </thead>
+                                <tbody>     
+                                  
+                                <tr v-if="file" role="button" class="datarow" v-for="(file, index) in selectedOrder.data.files" :key="file.Guid"
+                                  v-on:click.prevent="open(file)">                                  
+                                    <td></td>
+                                    <td><% index + 1 %></td>
+                                    <th scope="row"><% file.Name %></th>
+                                    <td><% file.Size | humanFileSize %></td>
+                                    <td><% file.Type %></td>                                                                    
+                                  </tr>                                         
+                                </tbody>
+                              </table>
+                                                   
+                        </div>                      
+                    </div>
+                    </div>
+                  </div>
+
+
+                     </div>
+                    </div>             
+                  </div>
+
+                </div>  
+
+              </div>
+            </div>
+          </div>
+     </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}    
+  <script src="/static/vendors/vue/vue.min.js"></script>    
+  <script src="/static/vendors/vue-select/dist/vue-select.js"></script>    
+  <script src="/static/vendors/vuejs-datepicker/build.min.js"></script>    
+  <!--<script src="/static/vendors/vue-paginate/vue-paginate.min.js"></script>-->
+  <script src="https://unpkg.com/vuejs-paginate@latest"></script>
+  <!-- <script src="/static/build/dist/app/contract.min.js?0.0.1"></script> -->
+  <script src="/static/build/js/app/client_order.js?0.0.1" type="module"></script>
+{% endblock javascripts %}
