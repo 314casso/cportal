@@ -83,11 +83,11 @@ class OrderService(SudsService):
                                 client_order.contracts.add(contract)
                                                 
                         if item['data']['files']:
-                            for data_dict in item['data']['files']:                                
-                                file_store = client_order.files.get_or_create(
+                            for data_dict in item['data']['files']:                                                                
+                                file_store, created  = client_order.files.get_or_create(
                                     guid=data_dict['Guid']
                                 )
-                                file_store.title = data_dict['Name'],
+                                file_store.title = data_dict['Name']
                                 file_store.storage = u'СделкаСКлиентомПрисоединенныеФайлы'
                                 file_store.doc_type = data_dict['Type']
                                 file_store.extension = data_dict['Extension']
