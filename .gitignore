@@ -14,3 +14,4 @@ export/wsgi.py
 pip-selfcheck.json
 README.md
 logs
+export/export/.settings.py.swp
