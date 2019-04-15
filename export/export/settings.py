@@ -180,7 +180,7 @@ INSTALLED_APPS = (
     'django_select2',
     'django_rq',
     'rest_framework',
-    'debug_toolbar',
+    #'debug_toolbar',
 )
 
 BASE_RQ_PROC = 'cportal'
