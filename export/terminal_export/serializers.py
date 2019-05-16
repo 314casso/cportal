@@ -24,7 +24,15 @@ class TerminalExportSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.TerminalExport
         fields = ('nomenclature', 'container', 'rowindex')
-               
+
+
+class LineDemurrageSerializer(serializers.HyperlinkedModelSerializer):
+    container = ContainerSerializer()
+    nomenclature = NomenclatureSerializer()
+    class Meta:
+        model = models.LineDemurrage       
+        fields = ('nomenclature', 'container', 'emptydate', 'status', 'stuffdate', 'freetime', 'deadline', 'overtime', 'emptytime', 'cargotime', 'totaldays')
+                       
 
 class DateQueryTrackingSerializer(serializers.HyperlinkedModelSerializer):        
     files = FileSerializer(many=True)
@@ -39,3 +47,19 @@ class DateQueryTrackingSerializer(serializers.HyperlinkedModelSerializer):
         depth = 1
         model = DateQueryEvent
         fields = ('id', 'date', 'user', 'type', 'files', 'status', 'note', 'terminalexports')
+
+
+class DateQueryLineDemurrageSerializer(serializers.HyperlinkedModelSerializer):
+    files = FileSerializer(many=True)
+    user = UserSerializer()  
+    linedemurrages = LineDemurrageSerializer(many=True)
+    type = serializers.SerializerMethodField()
+    
+    def get_type(self, obj):
+        return obj.get_type_display()  
+      
+    class Meta:
+        depth = 1
+        model = DateQueryEvent
+        fields = ('id', 'date', 'user', 'type', 'files', 'status', 'note', 'linedemurrages')
+        

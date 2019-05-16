@@ -1,0 +1,231 @@
+{% extends "app/base_site.html" %}
+
+{% block title %}{% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}  
+  <style>
+      .v-select .dropdown-toggle {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+      }      
+  </style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="right_col" role="main">
+
+    <div class="row">
+                 
+        <div class="clearfix"></div>
+        
+        <div class="x_content">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>{{ service }}</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>                  
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content" id="app-terminal-export">                       
+                    <div v-if="loading" class='cssload-jumping'><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="clearfix"></div>                      
+                    <div v-for="item in items" v-cloak>                      
+                      <div class="clearfix"></div>
+                      <!-- -->                      
+                      <div class="col-md-4 col-sm-4 col-xs-12">
+                      
+                        <div v-if="error" class="alert alert-danger">
+                          <strong>Ошибка!</strong>
+                          <% error %>
+                        </div>
+                      
+                        <div class="panel panel-default">
+                          <div class="panel-heading">
+                            <i class="fa fa-search"></i>
+                            <strong>Фильтр</strong>                                                                                    
+
+                            <div class="pull-right">
+                                <span title="Отобрано строк" v-if="isFiltered">
+                                    <label class="label label-warning">
+                                        <% stats.total_rows %> из <% stats.total_unfiltered %>
+                                      </label>
+                                </span>
+                                <span title="Всего строк" v-else>
+                                    <label class="label label-success">
+                                        <% stats.total_rows %>
+                                      </label>
+                                </span>                                                     
+                              </div>                            
+
+                          </div>
+                          <div class="panel-body">
+                      
+                            <div class="input-group">
+                              <span class="input-group-addon">Контейнер</span>
+                              <input v-model='filter.number' type="search" class="form-control" name="search" autocomplete="off">
+                              <span class="input-group-btn">
+                                <button class="btn btn-default" v-on:click="clearSearch" type="button">
+                                  <i class="glyphicon glyphicon-remove"></i>
+                                </button>
+                              </span>
+                            </div>
+                      
+                            <div class="input-group">
+                              <span class="input-group-addon">Размер</span>
+                              <v-select v-model='filter.size' multiple :options="filterOptions.sizes"></v-select>
+                            </div>
+                      
+                            <div class="input-group">
+                              <span class="input-group-addon">Тип</span>
+                              <v-select v-model='filter.type' multiple :options="filterOptions.types"></v-select>
+                            </div>
+                      
+                            <div class="input-group">
+                              <span class="input-group-addon">Линия</span>
+                              <v-select v-model='filter.line' multiple :options="filterOptions.lines"></v-select>
+                            </div>
+
+                            <div class="input-group">
+                              <span class="input-group-addon">Терминал</span>
+                              <v-select v-model='filter.terminal' multiple :options="filterOptions.terminals"></v-select>
+                            </div>
+
+                            <div class="input-group">
+                              <span class="input-group-addon">Дата</span>                              
+                              
+                              <vuejs-datepicker input-class="form-control" :format="customFormatter" :highlighted="highlighted" 
+                                  v-model="filter.date" monday-first=true></vuejs-datepicker>                              
+                                  <span class="input-group-btn">
+                                      <button class="btn btn-default" v-on:click="clearDate" type="button">
+                                        <i class="glyphicon glyphicon-remove"></i>
+                                      </button>
+                                    </span>
+                            </div>
+
+                            <div class="clearfix"></div>
+
+                            <div v-if="isFiltered">
+                              <button class="btn btn-primary" v-on:click="clearFilter" type="button">
+                                <i class="glyphicon glyphicon-remove"></i> Сбросить фильтр
+                              </button>
+                            </div>
+
+                          </div>
+                      
+                        </div>
+                      
+                        <div class="clearfix"></div>
+                      
+                        <div class="panel panel-default">
+                          <div class="panel-heading">
+                            <i class="fa fa-save"></i> Файлы для скачивания
+                            <div class="pull-right">
+                              <label class="label label-info" title="Дата обновления информации">
+                                <% item.date | moment %>
+                              </label>
+                            </div>
+                          </div>
+                          <div class="panel-body">
+                            <div v-for="file in item.files" class="list-group">
+                              <a href="#" class="list-group-item list-group-item-info" v-on:click="open(file.file)">
+                                <strong>
+                                  <% file.title | upper %>
+                                </strong>
+                              </a>
+                            </div>
+                          </div>
+                        </div>                      
+                      </div>
+                      <!--  -->
+
+                      <div class="col-md-12 col-sm-12 col-xs-12">                       
+
+                              <div class="panel panel-default">
+                                  <div class="panel-heading">
+                                      
+                                    <label class="label label-default"><% stats.total_rows %></label>&nbsp;
+                                    <strong>Список порожних контейнеров на терминале</strong>                                     
+                                    <div class="pull-right">
+                                        <label class="label label-info" title="Дата обновления информации">
+                                            <% item.date | moment %>
+                                        </label>
+                                    </div>
+                                  </div>
+                                  <div class="panel-body">  
+
+                          <div v-if="true" style="overflow: auto">
+                            <table class="table table-hover">
+                              <thead>                                                              
+                                <tr>
+                                  <th>&nbsp;</th>
+                                  <th>#</th>
+                                  <th>Линия</th>
+                                  <th>Номер</th>
+                                  <th>Размер</th>
+                                  <th>Тип</th>                                  
+                                  <th>Терминал</th>
+                                  <th>Дата порожнего</th>
+                                  <th>Статус</th>
+                                  <th>Дата перетарки</th>
+                                  <th>Контракт</th>
+                                  <th>Freetime</th>
+                                  <th>Deadline</th>
+                                  <th>Overtime <i class="fa fa-fw fa-sort-asc"></i> </th>
+                                  <th>Время пр. порожнего</th>
+                                  <th>Время пр. груженого</th>
+                                  <th>Всего дней</th>
+                                </tr>                                
+                              </thead>
+                              <tbody>                                                                             
+                                <tr v-if="row.container" role="button" class="datarow" v-for="(row, index) in rows(item)" v-on:click="setCurrentItem(row)" v-bind:class="{active: row == currentItem }">                                  
+                                  <td><i v-bind:class="{'glyphicon glyphicon-play': row == currentItem }"></i></td>
+                                  <td><% index + 1 %></td>
+                                  <td><% row.container.line %></td>
+                                  <th class="text-nowrap" scope="row"><% row.container.number %></th>
+                                  <td><% row.container.size %></td>
+                                  <td><% row.container.type %></td>                                                                  
+                                  <td class="text-nowrap"><% row.container.terminal %></td>
+                                  <td><% row.emptydate | date %></td>
+                                  <td><% row.status %></td>
+                                  <td><% row.stuffdate | date %></td>
+                                  <td><% row.container.contract %></td>
+                                  <td><% row.freetime %></td>
+                                  <td><% row.deadline | date %></td>
+                                  <td><% row.overtime %></td>
+                                  <td><% row.emptytime %></td>
+                                  <td><% row.cargotime %></td>
+                                  <td><% row.totaldays %></td>
+                                </tr>                                         
+                              </tbody>
+                            </table>
+                          </div>                       
+                      </div>                      
+                  </div>
+                </div>
+
+                </div>
+                </div>  
+
+              </div>
+            </div>
+          </div>
+     </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}    
+  <script src="/static/vendors/vue/vue.min.js"></script>    
+  <script src="/static/vendors/vue-select/dist/vue-select.js"></script>    
+  <script src="/static/vendors/vuejs-datepicker/build.min.js"></script>    
+  <script src="/static/build/dist/app/line_demurrage.min.js?0.0.6"></script>
+  <!--script src="/static/build/js/app/line_demurrage.js?0.0.4" type="module"></script>-->
+{% endblock javascripts %}

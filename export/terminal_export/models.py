@@ -34,4 +34,24 @@ class TerminalExport(models.Model):
     nomenclature = models.ForeignKey(Nomenclature, blank=True, null=True)    
     class Meta:
         ordering = ('rowindex',)
-    
+		
+
+class LineDemurrage(models.Model):    
+    event = models.ForeignKey(DateQueryEvent, related_name="linedemurrages")
+    container = models.OneToOneField(Container, blank=True, null=True)
+    nomenclature = models.ForeignKey(Nomenclature, blank=True, null=True)       
+    emptydate = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(max_length=50, blank=True, null=True)
+    stuffdate = models.DateTimeField(blank=True, null=True) 
+    freetime = models.IntegerField(blank=True, null=True) 
+    deadline = models.DateTimeField(blank=True, null=True)
+    overtime = models.IntegerField(blank=True, null=True)
+    emptytime = models.IntegerField(blank=True, null=True)
+    cargotime = models.IntegerField(blank=True, null=True)
+    totaldays = models.IntegerField(blank=True, null=True)
+
+    def __unicode__(self):
+        return u'{0}'.format(self.container)        
+
+    class Meta:
+        ordering = ('overtime',)

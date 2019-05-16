@@ -57,6 +57,7 @@ CONTRACTS = 6
 CONTRACT_FILES = 7
 ORDER_LIST = 8
 ORDER_DATA = 9
+LINE_DEMURRAGE = 10
 
 TYPE_CHOICES = (
     (REVISE, u'Взаиморасчеты'),
@@ -68,6 +69,7 @@ TYPE_CHOICES = (
     (CONTRACT_FILES, u'Файлы по контракту'),
     (ORDER_LIST, u'Список сделок'),
     (ORDER_DATA, u'Данные сделки'),
+    (LINE_DEMURRAGE, u'Демередж линии'),
 )    
 
 class DateQueryEvent(models.Model):

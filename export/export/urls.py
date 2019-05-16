@@ -44,6 +44,7 @@ urlpatterns += [
     url(r'pingorders/$', contract_views.ping_orders, name='pingorders'), 
     url(r'pingorderdata/(?P<pk>\d+)/$', contract_views.ping_order_data, name='pingorderdata'),     
     url(r'^orderlist/$', contract_views.OrderListDashboardView.as_view(), name='orderlist'),       
+    url(r'^linedemurrage/$', terminal_export_views.LineDemurrageView.as_view(), name='linedemurrage'),
 ]
 
 urlpatterns += [
@@ -79,6 +80,8 @@ router.register(r'contracts', contract_views.ContractViewSet, 'contracts')
 router.register(r'contractfiles', contract_views.ContractFileViewSet, 'contractfiles')
 router.register(r'clientorders', contract_views.OrderViewSet, 'clientorders')
 router.register(r'orderdata', contract_views.OrderDataViewSet, 'orderdata')
+router.register(r'pinglinedemurrage', terminal_export_views.PingLineDemurrage, 'pinglinedemurrage')
+router.register(r'linedemurrages', terminal_export_views.LineDemurrageViewSet, 'linedemurrages')
 
 
 # Wire up our API using automatic URL routing.

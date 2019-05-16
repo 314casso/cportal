@@ -15,3 +15,9 @@ def terminal_export_task(user):
 def empty_stock_task(user):            
     service = TerminalExportService(WEB_SERVISES['cp'])
     service.get_empty_stock(user)                                            
+
+
+@job(BASE_RQ_PROC)
+def line_demurrage_task(user):            
+    service = TerminalExportService(WEB_SERVISES['cp'])
+    service.get_line_demurrage(user)                                            
