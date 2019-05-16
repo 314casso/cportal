@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 from zeep import helpers
 
 import nutep.models
-from nutep.services import BaseEventService
+from nutep.services import BaseEventService, SudsService
 from nutep.utils import set_properties
 from terminal_export import models
 
@@ -85,8 +85,10 @@ class TerminalExportService(BaseEventService):
             event.save()
         except Exception, e:
             tb = traceback.format_exc()
-            self.log_event_error(e, event, tb)
+            self.log_event_error(e, event, tb)         
 
+
+class LineDemurrageService(SudsService):
     def get_line_demurrage(self, user):
         try:
             company = user.companies.filter(
@@ -125,4 +127,4 @@ class TerminalExportService(BaseEventService):
             event.save()
         except Exception, e:            
             tb = traceback.format_exc()
-            self.log_event_error(e, event, tb)            
+            self.log_event_error(e, event, tb)

@@ -1,8 +1,9 @@
 from django_rq import job
 
-from export.settings import BASE_RQ_PROC 
 from export.local_settings import WEB_SERVISES
-from terminal_export.services import TerminalExportService
+from export.settings import BASE_RQ_PROC
+from terminal_export.services import (LineDemurrageService,
+                                      TerminalExportService)
 
 
 @job(BASE_RQ_PROC)
@@ -19,5 +20,5 @@ def empty_stock_task(user):
 
 @job(BASE_RQ_PROC)
 def line_demurrage_task(user):            
-    service = TerminalExportService(WEB_SERVISES['cp'])
+    service = LineDemurrageService(WEB_SERVISES['cp'])
     service.get_line_demurrage(user)                                            

@@ -89,6 +89,5 @@ class LineDemurrageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         q = nutep.models.DateQueryEvent.objects.for_user(
-            self.request.user).filter(type=nutep.models.LINE_DEMURRAGE)
-        q = q.exclude(status__in=(nutep.models.DateQueryEvent.PENDING,))
+            self.request.user).filter(type=nutep.models.LINE_DEMURRAGE, status=nutep.models.DateQueryEvent.SUCCESS)        
         return q.order_by('-date')[:1]        
