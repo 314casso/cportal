@@ -38,8 +38,7 @@ class PingEmptyStock(viewsets.ViewSet):
 
 
 class PingLineDemurrage(viewsets.ViewSet):
-    def list(self, request):
-        line_demurrage_task(request.user)     
+    def list(self, request):        
         today = now()        
         key = u'last_ping_line_demurrage_%s' % request.user.pk
         if cache.get(key):
