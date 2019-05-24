@@ -35,12 +35,12 @@
                   <div class="clearfix"></div>
                 </div>
                 <div class="x_content" id="app-terminal-export">                       
-                    <div v-if="loading" class='cssload-jumping'><span></span><span></span><span></span><span></span><span></span></div>
+                    <div title="Идет обновление данных из учетной системы... " v-if="loading" class='cssload-jumping'><span></span><span></span><span></span><span></span><span></span></div>
                     <div class="clearfix"></div>                      
                     <div v-for="item in items" v-cloak>                      
                       <div class="clearfix"></div>
                       <!-- -->                      
-                      <div class="col-md-4 col-sm-4 col-xs-12">
+                      <div class="col-md-8 col-sm-8 col-xs-12">
                       
                         <div v-if="error" class="alert alert-danger">
                           <strong>Ошибка!</strong>
@@ -67,6 +67,8 @@
 
                           </div>
                           <div class="panel-body">
+
+                            <div class="col-md-6 col-sm-6 col-xs-12">
                       
                             <div class="input-group">
                               <span class="input-group-addon">Контейнер</span>
@@ -93,9 +95,23 @@
                               <v-select v-model='filter.line' multiple :options="filterOptions.lines"></v-select>
                             </div>
 
+                            </div>
+
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+
                             <div class="input-group">
                               <span class="input-group-addon">Терминал</span>
                               <v-select v-model='filter.terminal' multiple :options="filterOptions.terminals"></v-select>
+                            </div>
+
+                            <div class="input-group">
+                              <span class="input-group-addon">Статус</span>
+                              <v-select v-model='filter.status' multiple :options="filterOptions.statuses"></v-select>
+                            </div>
+
+                            <div class="input-group">
+                              <span class="input-group-addon">Марка</span>
+                              <v-select v-model='filter.cargomark' multiple :options="filterOptions.cargomarks"></v-select>
                             </div>
 
                             <div class="input-group">
@@ -108,6 +124,8 @@
                                         <i class="glyphicon glyphicon-remove"></i>
                                       </button>
                                     </span>
+                            </div>
+
                             </div>
 
                             <div class="clearfix"></div>
@@ -176,6 +194,7 @@
                                   <th>Статус</th>
                                   <th>Дата перетарки</th>
                                   <th>Контракт</th>
+                                  <th>Марка</th>
                                   <th>Freetime</th>
                                   <th>Deadline</th>
                                   <th>Overtime <i class="fa fa-fw fa-sort-asc"></i> </th>
@@ -197,6 +216,7 @@
                                   <td><% row.status %></td>
                                   <td><% row.stuffdate | date %></td>
                                   <td><% row.container.contract %></td>
+                                  <td class="text-nowrap"><% row.cargomark %></td>
                                   <td><% row.freetime %></td>
                                   <td><% row.deadline | date %></td>
                                   <td><% row.overtime %></td>
@@ -226,6 +246,6 @@
   <script src="/static/vendors/vue/vue.min.js"></script>    
   <script src="/static/vendors/vue-select/dist/vue-select.js"></script>    
   <script src="/static/vendors/vuejs-datepicker/build.min.js"></script>    
-  <script src="/static/build/dist/app/line_demurrage.min.js?0.0.6"></script>
-  <!--script src="/static/build/js/app/line_demurrage.js?0.0.4" type="module"></script>-->
+  <script src="/static/build/dist/app/line_demurrage.min.js?0.0.7"></script>
+  <!--<script src="/static/build/js/app/line_demurrage.js?0.0.7" type="module"></script>-->
 {% endblock javascripts %}

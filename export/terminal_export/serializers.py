@@ -31,7 +31,7 @@ class LineDemurrageSerializer(serializers.HyperlinkedModelSerializer):
     nomenclature = NomenclatureSerializer()
     class Meta:
         model = models.LineDemurrage       
-        fields = ('nomenclature', 'container', 'emptydate', 'status', 'stuffdate', 'freetime', 'deadline', 'overtime', 'emptytime', 'cargotime', 'totaldays')
+        fields = ('nomenclature', 'container', 'emptydate', 'status', 'stuffdate', 'freetime', 'deadline', 'overtime', 'emptytime', 'cargotime', 'totaldays', 'cargomark')
                        
 
 class DateQueryTrackingSerializer(serializers.HyperlinkedModelSerializer):        

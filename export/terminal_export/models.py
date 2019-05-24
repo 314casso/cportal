@@ -49,6 +49,7 @@ class LineDemurrage(models.Model):
     emptytime = models.IntegerField(blank=True, null=True)
     cargotime = models.IntegerField(blank=True, null=True)
     totaldays = models.IntegerField(blank=True, null=True)
+    cargomark = models.CharField(max_length=50, blank=True, null=True)
 
     def __unicode__(self):
         return u'{0}'.format(self.container)        

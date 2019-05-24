@@ -25,28 +25,34 @@ var appTerminalExport = new Vue({
             type: [],
             line: [],
             date: null,
-            terminal: []
+            terminal: [],
+            status: [],
+            cargomark: []
         },
         highlighted: {
             dates: [new Date()]
         }
     },
     delimiters: ["<%", "%>"],
+    created: function created() {
+        this.pingData();
+    },
     mounted: function mounted() {
         this.fetchData();
-        this.pingData();
     },
 
     computed: {
         isFiltered: function isFiltered() {
-            return this.filter.number || this.filter.size.length || this.filter.type.length || this.filter.line.length || this.filter.date || this.filter.terminal.length;
+            return this.filter.number || this.filter.size.length || this.filter.type.length || this.filter.line.length || this.filter.date || this.filter.terminal.length || this.filter.status.length || this.filter.cargomark.length;
         },
         filterOptions: function filterOptions() {
             var result = {
                 sizes: [],
                 lines: [],
                 types: [],
-                terminals: []
+                terminals: [],
+                statuses: [],
+                cargomarks: []
             };
             if (this.items.length == 0) {
                 return result;
@@ -56,6 +62,8 @@ var appTerminalExport = new Vue({
             var types = new Set();
             var lines = new Set();
             var terminals = new Set();
+            var statuses = new Set();
+            var cargomarks = new Set();
             rows.forEach(function (elem, i, arr) {
                 if (elem.container) {
                     sizes.add(elem.container.size);
@@ -63,11 +71,19 @@ var appTerminalExport = new Vue({
                     types.add(elem.container.type);
                     terminals.add(elem.container.terminal);
                 }
+                if (elem.status) {
+                    statuses.add(elem.status);
+                }
+                if (elem.cargomark) {
+                    cargomarks.add(elem.cargomark);
+                }
             });
             result.sizes = Array.from(sizes);
             result.lines = Array.from(lines);
             result.types = Array.from(types);
             result.terminals = Array.from(terminals);
+            result.statuses = Array.from(statuses);
+            result.cargomarks = Array.from(cargomarks);
             return result;
         }
     },
@@ -89,7 +105,7 @@ var appTerminalExport = new Vue({
         fetchData: function fetchData() {
             var _this = this;
 
-            console.log("fetchData");
+            NProgress.start();
             var xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/linedemurrages/');
             xhr.onload = function () {
@@ -98,10 +114,11 @@ var appTerminalExport = new Vue({
                     _this.items = data;
                     if (data && data[0].linedemurrages) {
                         _this.currentItem = data[0].linedemurrages[0];
-                        console.log(_this.currentItem);
                     }
                 } catch (e) {
                     _this.error = "Произошла ошибка обновления данных: " + e;
+                } finally {
+                    NProgress.done();
                 }
             };
             xhr.send();
@@ -114,7 +131,6 @@ var appTerminalExport = new Vue({
         },
         clearDate: function clearDate() {
             this.filter.date = null;
-            console.log('OK');
         },
         clearFilter: function clearFilter() {
             this.filter.number = '';
@@ -123,6 +139,8 @@ var appTerminalExport = new Vue({
             this.filter.line = [];
             this.filter.terminal = [];
             this.filter.date = null;
+            this.filter.status = [];
+            this.filter.cargomark = [];
         },
         setCurrentItem: function setCurrentItem(item) {
             this.currentItem = item;
@@ -155,6 +173,12 @@ var appTerminalExport = new Vue({
                         return false;
                     }
                     if (self.filter.terminal.length && !self.filter.terminal.includes(row.container.terminal)) {
+                        return false;
+                    }
+                    if (self.filter.status.length && !self.filter.status.includes(row.status)) {
+                        return false;
+                    }
+                    if (self.filter.cargomark.length && !self.filter.cargomark.includes(row.cargomark)) {
                         return false;
                     }
                     if (self.filter.date && !(moment(self.filter.date).format('YYYY-MM-DD') == moment(row.emptydate).format('YYYY-MM-DD'))) {
