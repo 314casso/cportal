@@ -27,7 +27,8 @@ var appTerminalExport = new Vue({
             date: null,
             terminal: [],
             status: [],
-            cargomark: []
+            cargomark: [],
+            departed: false
         },
         highlighted: {
             dates: [new Date()]
@@ -43,7 +44,7 @@ var appTerminalExport = new Vue({
 
     computed: {
         isFiltered: function isFiltered() {
-            return this.filter.number || this.filter.size.length || this.filter.type.length || this.filter.line.length || this.filter.date || this.filter.terminal.length || this.filter.status.length || this.filter.cargomark.length;
+            return this.filter.number || this.filter.size.length || this.filter.type.length || this.filter.line.length || this.filter.date || this.filter.terminal.length || this.filter.status.length || this.filter.cargomark.length || this.filter.departed;
         },
         filterOptions: function filterOptions() {
             var result = {
@@ -141,6 +142,7 @@ var appTerminalExport = new Vue({
             this.filter.date = null;
             this.filter.status = [];
             this.filter.cargomark = [];
+            this.filter.departed = false;
         },
         setCurrentItem: function setCurrentItem(item) {
             this.currentItem = item;
@@ -179,6 +181,9 @@ var appTerminalExport = new Vue({
                         return false;
                     }
                     if (self.filter.cargomark.length && !self.filter.cargomark.includes(row.cargomark)) {
+                        return false;
+                    }
+                    if (!self.filter.departed && row.container.dateout) {
                         return false;
                     }
                     if (self.filter.date && !(moment(self.filter.date).format('YYYY-MM-DD') == moment(row.emptydate).format('YYYY-MM-DD'))) {

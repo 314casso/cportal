@@ -95,6 +95,11 @@
                               <v-select v-model='filter.line' multiple :options="filterOptions.lines"></v-select>
                             </div>
 
+                            <div class="input-group">
+                              <span class="input-group-addon">Ушедшие</span>
+                              <input type="checkbox" id="departed" v-model="filter.departed">                              
+                            </div>
+
                             </div>
 
                             <div class="col-md-6 col-sm-6 col-xs-12">

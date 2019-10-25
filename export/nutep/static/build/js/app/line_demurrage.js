@@ -45,7 +45,7 @@ var appTerminalExport = new Vue({
         isFiltered: function () {
             return this.filter.number || this.filter.size.length || this.filter.type.length 
                 || this.filter.line.length || this.filter.date || this.filter.terminal.length
-                || this.filter.status.length || this.filter.cargomark.length;
+                || this.filter.status.length || this.filter.cargomark.length || this.filter.departed;
         },
         filterOptions: function () {
             let result = { 
@@ -179,6 +179,9 @@ var appTerminalExport = new Vue({
                         return false;                       
                     }
                     if (self.filter.cargomark.length && !self.filter.cargomark.includes(row.cargomark)) {	
+                        return false;                       
+                    }
+                    if (!self.filter.departed && row.container.dateout) {	
                         return false;                       
                     }
                     if (self.filter.date && !(moment(self.filter.date).format('YYYY-MM-DD') == moment(row.emptydate).format('YYYY-MM-DD'))) {	                        
