@@ -193,6 +193,7 @@
                                   <th>Дата порожнего</th>
                                   <th>Статус</th>
                                   <th>Дата перетарки</th>
+                                  <td>Дата ухода</td>
                                   <th>Контракт</th>
                                   <th>Марка</th>
                                   <th>Freetime</th>
@@ -215,6 +216,7 @@
                                   <td><% row.emptydate | date %></td>
                                   <td><% row.status %></td>
                                   <td><% row.stuffdate | date %></td>
+                                  <td><% row.container.dateout %></td>
                                   <td><% row.container.contract %></td>
                                   <td class="text-nowrap"><% row.cargomark %></td>
                                   <td><% row.freetime %></td>
