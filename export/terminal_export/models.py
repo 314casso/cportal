@@ -11,7 +11,7 @@ class Container(BaseContainer):
     emptyweight = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
     seal = models.CharField(max_length=150, blank=True, null=True)
     datein = models.DateField(blank=True, null=True)
-    dateout = models.DateField(blank=True, null=True)
+    dateout = models.DateTimeField(blank=True, null=True)
     contract = models.CharField(max_length=150, blank=True, null=True)
     terminal = models.CharField(max_length=150, blank=True, null=True)
     

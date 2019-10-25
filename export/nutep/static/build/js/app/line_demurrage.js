@@ -25,7 +25,8 @@ var appTerminalExport = new Vue({
             date: null,
             terminal: [],
             status: [],
-            cargomark: []
+            cargomark: [],
+            departed: false
         },
         highlighted: {            
             dates: [
@@ -138,7 +139,8 @@ var appTerminalExport = new Vue({
             this.filter.terminal = [];
             this.filter.date = null;   
             this.filter.status = [];
-            this.filter.cargomark = [];         
+            this.filter.cargomark = [];
+            this.filter.departed = false;
         },
         setCurrentItem: function (item) {
             this.currentItem = item;
