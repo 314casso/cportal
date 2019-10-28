@@ -26,7 +26,7 @@ var appTerminalExport = new Vue({
             terminal: [],
             status: [],
             cargomark: [],
-            departed: false
+            departed: true
         },
         highlighted: {            
             dates: [
@@ -181,7 +181,7 @@ var appTerminalExport = new Vue({
                     if (self.filter.cargomark.length && !self.filter.cargomark.includes(row.cargomark)) {	
                         return false;                       
                     }
-                    if (!self.filter.departed && row.container.dateout) {	
+                    if (self.filter.departed && row.container.dateout) {	
                         return false;                       
                     }
                     if (self.filter.date && !(moment(self.filter.date).format('YYYY-MM-DD') == moment(row.emptydate).format('YYYY-MM-DD'))) {	                        

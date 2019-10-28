@@ -95,11 +95,6 @@
                               <v-select v-model='filter.line' multiple :options="filterOptions.lines"></v-select>
                             </div>
 
-                            <div class="input-group">
-                              <span class="input-group-addon">Ушедшие</span>
-                              <input type="checkbox" id="departed" v-model="filter.departed">                              
-                            </div>
-
                             </div>
 
                             <div class="col-md-6 col-sm-6 col-xs-12">
@@ -130,6 +125,12 @@
                                       </button>
                                     </span>
                             </div>
+
+                            <div class="form-check">                                                                                                                        
+                              <label class="form-check-label">
+                              <input class="form-check-input" type="checkbox" id="departed" v-model="filter.departed">
+                              Скрыть ушедшие</label>
+                            </div> 
 
                             </div>
 
@@ -253,6 +254,6 @@
   <script src="/static/vendors/vue/vue.min.js"></script>    
   <script src="/static/vendors/vue-select/dist/vue-select.js"></script>    
   <script src="/static/vendors/vuejs-datepicker/build.min.js"></script>    
-  <script src="/static/build/dist/app/line_demurrage.min.js?0.0.7"></script>
-  <!--<script src="/static/build/js/app/line_demurrage.js?0.0.8" type="module"></script>-->
+  <!-- <script src="/static/build/dist/app/line_demurrage.min.js?0.0.7"></script> -->
+  <script src="/static/build/js/app/line_demurrage.js?0.0.8" type="module"></script>
 {% endblock javascripts %}
