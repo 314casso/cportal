@@ -3,6 +3,7 @@ import nutep.models
 import traceback
 from inspection.models import Inspection
 from django.core.files.base import ContentFile
+import base64
 
 
 class InspectionService(SudsService):    
@@ -35,7 +36,8 @@ class InspectionService(SudsService):
                         storage=f.storage,
                         extension=f.extension,
                         )
-                    file_store.file.save(fname, ContentFile(f.data))                    
+                    data = base64.b64decode(f.data)
+                    file_store.file.save(fname, ContentFile(data))                    
                 
             event.status = nutep.models.DateQueryEvent.SUCCESS
             event.save()
