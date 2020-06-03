@@ -175,6 +175,7 @@ INSTALLED_APPS = (
     'tracking',
     'contpics',
     'contract',
+    'inspection',
     'django.contrib.admin',    
     'easy_thumbnails',
     'django_select2',

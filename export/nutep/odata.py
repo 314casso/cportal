@@ -72,10 +72,10 @@ class Portal(BaseSession):
             'portal_id' : user['ID'],                                       
             'mobile' : user['PERSONAL_MOBILE'],             
             'imagedata' : user['image'],        
-            # 'first_name' : user['NAME'],
-            # 'last_name' : user['LAST_NAME'],
-            # 'middle_name' : user['SECOND_NAME'],
-            # 'job_title' : user['WORK_POSITION'],
+            'first_name' : user['NAME'],
+            'last_name' : user['LAST_NAME'],
+            'middle_name' : user['SECOND_NAME'],
+            'job_title' : user['WORK_POSITION'],
              } 
             return dto
 

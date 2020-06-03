@@ -11,6 +11,7 @@ from terminal_export import views as terminal_export_views
 from tracking import views as tracking_views
 from contpics import views as contpics_views
 from contract import views as contract_views
+from inspection import views as inspection_views
 
 
 admin.autodiscover()
@@ -45,6 +46,10 @@ urlpatterns += [
     url(r'pingorderdata/(?P<pk>\d+)/$', contract_views.ping_order_data, name='pingorderdata'),     
     url(r'^orderlist/$', contract_views.OrderListDashboardView.as_view(), name='orderlist'),       
     url(r'^linedemurrage/$', terminal_export_views.LineDemurrageView.as_view(), name='linedemurrage'),
+    url(r'^inspection/$', inspection_views.DashboardView.as_view(), name='inspection'),
+    url(r'^inspections/$', inspection_views.get_inspections, name='inspections'),
+    url(r'^getinspection/(?P<guid>.*)/$', inspection_views.get_inspection, name='getinspection'),
+    
 ]
 
 urlpatterns += [
@@ -82,6 +87,8 @@ router.register(r'clientorders', contract_views.OrderViewSet, 'clientorders')
 router.register(r'orderdata', contract_views.OrderDataViewSet, 'orderdata')
 router.register(r'pinglinedemurrage', terminal_export_views.PingLineDemurrage, 'pinglinedemurrage')
 router.register(r'linedemurrages', terminal_export_views.LineDemurrageViewSet, 'linedemurrages')
+router.register(r'inspection', inspection_views.InspectionViewSet, 'inspection')
+
 
 
 # Wire up our API using automatic URL routing.

@@ -58,6 +58,7 @@ CONTRACT_FILES = 7
 ORDER_LIST = 8
 ORDER_DATA = 9
 LINE_DEMURRAGE = 10
+INSPECTION = 11
 
 TYPE_CHOICES = (
     (REVISE, u'Взаиморасчеты'),
@@ -70,6 +71,7 @@ TYPE_CHOICES = (
     (ORDER_LIST, u'Список сделок'),
     (ORDER_DATA, u'Данные сделки'),
     (LINE_DEMURRAGE, u'Демередж линии'),
+    (INSPECTION, u'Осмотр контейнера'),
 )    
 
 class DateQueryEvent(models.Model):
@@ -281,6 +283,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, unique=True, related_name='profile')
     valid_till = models.DateField(blank=True, null=True)
     image = models.ImageField(upload_to=userprofile_path, blank=True, null=True,)
+    show_news =  models.BooleanField(default=True)
            
     def get_fullname(self):
         return u'%s %s %s' % (self.user.last_name, self.user.first_name, self.middle_name)    

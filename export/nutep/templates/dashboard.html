@@ -39,6 +39,7 @@
 		
 	{% include "inc/profile.html" with manager=head %}
     
+    {% if request.user.profile.show_news %}
     <div class="col-md-4">
         <div class="x_panel">
             <div class="x_title">
@@ -66,6 +67,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     </div>
 
