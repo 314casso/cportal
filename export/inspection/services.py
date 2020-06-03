@@ -1,11 +1,11 @@
-from nutep.services import BaseEventService
+from nutep.services import SudsService
 import nutep.models
 import traceback
 from inspection.models import Inspection
 from django.core.files.base import ContentFile
 
 
-class InspectionService(BaseEventService):    
+class InspectionService(SudsService):    
     def get_inspections(self, user, company, start_date=None, end_date=None):        
         response = self._client.service.GetInspections(
             company.ukt_guid)
