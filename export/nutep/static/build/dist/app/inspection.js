@@ -17,16 +17,49 @@ var app = new Vue({
 		error: '',
 		data: [],
 		index: null,
-		inspection: {}
+		inspection: {},
+		listClosed: true,
+		filter: {},
+		isFiltered: false,
+		stats: {
+			total: 0,
+			filtered: 0
+		}
+
 	},
 	created: function created() {
 		this.loadData();
 	},
 	computed: {
 		sortedDate: function sortedDate() {
-			return this.data.sort(function (a, b) {
+			var rows = this.data.sort(function (a, b) {
 				return new Date(b.date) - new Date(a.date);
 			});
+			var self = this;
+			self.stats.total = 0;
+			self.stats.filtered = 0;
+			var filtered = rows.filter(function (row) {
+
+				var containers = row.docdata.filter(function (cont) {
+					if (self.filter.container && !(cont.container.search(new RegExp(self.filter.container, "i")) != -1)) {
+						return false;
+					}
+					return true;
+				});
+
+				row.containers = containers;
+				row.count = containers.length;
+				self.stats.filtered += row.count;
+				self.stats.total += row.docdata.length;
+
+				if (!row.count) {
+					return false;
+				}
+				return true;
+			});
+			this.isFiltered = filtered.length != rows.length;
+			this.stats.filtered = filtered.length;
+			return filtered;
 		},
 		inspectionImages: function inspectionImages() {
 			if (this.inspection.files) {
@@ -111,7 +144,17 @@ var app = new Vue({
 		containerClick: function containerClick(curdoc) {
 			this.curdoc = curdoc;
 			this.loadItem(curdoc.guid);
-			// $('.collapse').collapse('toggle');            
+		},
+		listAction: function listAction() {
+			if (this.listClosed) {
+				$('.collapse').collapse('show');
+			} else {
+				$('.collapse').collapse('hide');
+			}
+			this.listClosed = !this.listClosed;
+		},
+		clearSearch: function clearSearch() {
+			this.filter = {};
 		}
 	},
 	filters: {

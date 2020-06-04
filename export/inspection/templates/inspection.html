@@ -15,7 +15,7 @@
         
         <div class="page-title">
           <div class="title_left">
-            <h3>{{ service }} </h3>
+            <h3>{{ service }} <small>за последние 90 дней</small></h3>            
           </div>
         </div>
   
@@ -31,41 +31,70 @@
                         <div v-if="loading" class='cssload-jumping'><span></span><span></span><span></span><span></span><span></span></div>
                         <div class="clearfix"></div>  
                         
+                        <div class="input-group">
+                          <span class="input-group-addon">Контейнер</span>
+                          <input v-model='filter.container' type="search" class="form-control" name="search" autocomplete="off">
+                                             
+
+                          <span class="input-group-btn" v-if="isFiltered">
+                            <button class="btn btn-default" v-on:click="clearSearch" type="button">
+                              <i class="glyphicon glyphicon-remove"></i>                              
+                            </button>
+                          </span>
+                        </div>
+                                              
+
+                        <transition name="fade">
+                          <div v-for="error in errors">
+                              <div v-if="error" class="alert alert-danger" role="alert">
+                                  <% error.message %>
+                              </div>
+                          </div>
+                      </transition>
+      
+                      <transition name="fade">
+                          <div class="alert alert-success" role="alert" id="message" v-if="info">
+                              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                      aria-hidden="true">&times;</span></button>
+                              <% info %>
+                          </div>
+                      </transition>
+
                         <div class="row">
                           <div class="col-sm-2">
-                              <transition name="fade">
-                                  <div v-for="error in errors">
-                                      <div v-if="error" class="alert alert-danger" role="alert">
-                                          <% error.message %>
-                                      </div>
-                                  </div>
-                              </transition>
-              
-                              <transition name="fade">
-                                  <div class="alert alert-success" role="alert" id="message" v-if="info">
-                                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                                              aria-hidden="true">&times;</span></button>
-                                      <% info %>
-                                  </div>
-                              </transition>
-              
+
+                          <div v-if="isFiltered" class="input-group">
+                            <span class="label label-warning"><% stats.filtered %>  из <% stats.total %></span>
+                          </div>
+
+                          <div v-else class="input-group">
+                            <span class="label label-info"><% stats.total %></span>
+                          </div>
+
+                            <div v-if="false" class="input-group">
+                              <button class="btn btn-light btn-sm" type="button" v-on:click="listAction">                                
+                                <i class='fa'  v-bind:class="listClosed ? 'fa-chevron-up': 'fa-chevron-down'"></i>                                                                
+                              </button>                              
+                            </div>                                                           
+                                          
                               <div class="accordion" id="accordionExample">
 
                                   <div class="panel panel-default" v-for='(date, index) in sortedDate'>
                                       <div class="panel-heading" id="headingOne">
                                           
-                                          <a data-toggle="collapse" 
+                                          <a v-if="false" data-toggle="collapse" 
                                               :data-target="'#' + index" aria-expanded="false" :aria-controls="index" href="#" onclick="event.preventDefault()">
-                                              <% date.date | shortdate %>
+                                              <% date.date | shortdate %> 
                                           </a>                                          
+                                          <% date.date | shortdate %> <span class="label label-default pull-right"><% date.count %></span>
                                       </div>
               
-                                      <div :id="index" class="collapse" aria-labelledby="headingOne" data-parent="">
+                                      <div :id="index" class="1collapse" aria-labelledby="headingOne" data-parent="">
                                           <div class="panel-body">
-                                              <div class="list-group" style="margin-bottom: 0;">
-                                                  <a v-on:click="containerClick(docitem)" href="#" v-for="docitem in date.docdata"
+                                              <div class="list-group" style="margin-bottom: 0;">                                                
+                                                  <a v-on:click="containerClick(docitem)" href="#" v-for="docitem in date.containers"
                                                       class="list-group-item list-group-item-action p-2" v-bind:class="{ active: docitem == curdoc }">
-                                                      <% docitem.container %>
+                                                      <% docitem.container %>                                                      
                                                   </a>
                                               </div>
                                           </div>
@@ -143,6 +172,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js"></script>
 
 
-  <script src="/static/build/dist/app/inspection.min.js?0.004"></script>
+  <!-- <script src="/static/build/dist/app/inspection.min.js?0.004"></script> -->
+  <script src="/static/build/js/app/inspection.js?0.004"></script>
   
 {% endblock javascripts %}
