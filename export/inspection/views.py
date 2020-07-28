@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import calendar
-import datetime
+import zipfile
+from io import BytesIO
 
-from django.core.cache import cache
 from django.http import JsonResponse
 from rest_framework import viewsets
+from rest_framework.response import Response
+
+from django.http import HttpResponse
 
 import nutep
-from nutep.serializers import DateQueryReviseSerializer
+
 from nutep.views import BaseService
 from export.local_settings import WEB_SERVISES
 from inspection.services import InspectionService
 from inspection.models import Inspection
-from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
 from inspection.serializers import InspectionSerializer
 
 
@@ -32,6 +32,24 @@ def get_inspection(request, guid):
     service = InspectionService(WEB_SERVISES['cp'])    
     service.get_inspection(request.user, company, guid)  
     return JsonResponse({'result': True})
+
+def inspection_zip(request, pk):
+    inspection = Inspection.objects.get(pk=pk)
+    
+    byte_data = BytesIO()
+    zip_file = zipfile.ZipFile(byte_data, "w")
+
+    for f in inspection.files.all():             
+        zip_file.write(f.file.path, f.file.name)
+    
+    zip_file.close()
+
+    response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=%s-%s.zip' % (inspection.container.replace(" ", ""), inspection.date.strftime("%d%m%Y"))
+    
+    zip_file.printdir()
+    return response
+   
 
 class InspectionViewSet(viewsets.ViewSet):     
     def list(self, request):

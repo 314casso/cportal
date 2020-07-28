@@ -104,7 +104,7 @@
                               </div>
                           </div>         
               
-                          <div class="col-sm-10" v-if="curdoc">
+                          <div class="col-sm-10" v-if="curdoc">                            
                             <h4>
                               <a href="#" v-on:click="resetItem(curdoc.guid)">
                                 <i class="fa fa-refresh"></i>
@@ -114,8 +114,9 @@
                                 <span class="text-muted"><% curdoc.date | shortdate %> <i class="fa fa-arrow-right"></i>
                                   <% curdoc.number %></span>
                               </small>
-                            </h4>
-                          
+                              <span class="pull-right"><i class="fa fa-download"></i> <a :href="'/inspectionzip/' + inspection.id">Скачать все файлы</a></span>
+                            </h4>                                             
+
                             <div class="row">
                           
                               <a :href="image.file" data-toggle="lightbox" data-gallery="example-gallery" class="col-sm-3 mt-3"

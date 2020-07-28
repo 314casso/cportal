@@ -49,6 +49,7 @@ urlpatterns += [
     url(r'^inspection/$', inspection_views.DashboardView.as_view(), name='inspection'),
     url(r'^inspections/$', inspection_views.get_inspections, name='inspections'),
     url(r'^getinspection/(?P<guid>.*)/$', inspection_views.get_inspection, name='getinspection'),
+    url(r'^inspectionzip/(?P<pk>.*)/$', inspection_views.inspection_zip, name='inspectionzip'),
     
 ]
 
