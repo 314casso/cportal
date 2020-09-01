@@ -15,3 +15,4 @@ pip-selfcheck.json
 README.md
 logs
 export/export/.settings.py.swp
+pyvenv.cfg
