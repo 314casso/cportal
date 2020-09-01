@@ -16,3 +16,5 @@ README.md
 logs
 export/export/.settings.py.swp
 pyvenv.cfg
+export/yarn.lock
+export/nutep/static/build/yarn.lock

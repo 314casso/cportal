@@ -3,3 +3,5 @@ export.sqlite3
 .vscode
 logfile
 /logs/*
+node_modules
+/export/node_modules

@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@babel/core": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
+    "add": "^2.0.6",
+    "babel-loader": "^8.1.0",
+    "babel-preset-es2015-riot": "^1.1.0",
+    "webpack": "^4.44.1"
+  }
+}

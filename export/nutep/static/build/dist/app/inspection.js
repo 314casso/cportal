@@ -84,7 +84,7 @@ var app = new Vue({
 
 			this.errors = [];
 			this.loading = true;
-			fetch('/inspections/').then(function (res) {
+			fetch('/inspections/', { credentials: 'include' }).then(function (res) {
 				_this.updated = new Date();
 				_this.status = res.status;
 				if (res.status !== 200) {
@@ -106,7 +106,7 @@ var app = new Vue({
 
 			this.errors = [];
 			this.loading = true;
-			fetch('/api/inspection/' + guid + '/?format=json').then(function (res) {
+			fetch('/api/inspection/' + guid + '/?format=json', { credentials: 'include' }).then(function (res) {
 				if (res.status !== 200) {
 					err = {};
 					err.message = getShortDate(_this2.updated) + '. Ошибка загрузки данных. Ответ сервера: ' + res.status;
@@ -126,7 +126,7 @@ var app = new Vue({
 
 			this.errors = [];
 			this.loading = true;
-			fetch('/getinspection/' + guid + '/').then(function (res) {
+			fetch('/getinspection/' + guid + '/', { credentials: 'include' }).then(function (res) {
 				if (res.status !== 200) {
 					err = {};
 					err.message = getShortDate(_this3.updated) + '. Ошибка загрузки данных. Ответ сервера: ' + res.status;

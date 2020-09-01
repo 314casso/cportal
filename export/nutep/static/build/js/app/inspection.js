@@ -74,7 +74,7 @@ var app = new Vue({
 		loadData: function () {
 			this.errors = [];			
 			this.loading = true;
-			fetch('/inspections/')
+			fetch('/inspections/', {credentials: 'include'})
 				.then(res => {
 					this.updated = new Date();
 					this.status = res.status;
@@ -95,7 +95,7 @@ var app = new Vue({
 		loadItem: function (guid) {
 			this.errors = [];
 			this.loading = true;			
-			fetch('/api/inspection/' + guid + '/?format=json')
+			fetch('/api/inspection/' + guid + '/?format=json', {credentials: 'include'})
 				.then(res => {					
 					if (res.status !== 200) {  
 						err = {}
@@ -114,7 +114,7 @@ var app = new Vue({
 		resetItem: function (guid) {
 			this.errors = [];
 			this.loading = true;			
-			fetch('/getinspection/' + guid + '/')
+			fetch('/getinspection/' + guid + '/', {credentials: 'include'})
 				.then(res => {					
 					if (res.status !== 200) {  
 						err = {}
