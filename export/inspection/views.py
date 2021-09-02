@@ -17,6 +17,7 @@ from inspection.services import InspectionService
 from inspection.models import Inspection
 from inspection.serializers import InspectionSerializer
 
+SERVICE_NAME = 'dc'
 
 class DashboardView(BaseService):
     TYPE = nutep.models.INSPECTION
@@ -24,12 +25,12 @@ class DashboardView(BaseService):
     
 def get_inspections(request):
     company = request.user.companies.filter(membership__is_general=True).first()
-    service = InspectionService(WEB_SERVISES['cp'])    
+    service = InspectionService(WEB_SERVISES[SERVICE_NAME])    
     return JsonResponse(service.get_inspections(request.user, company), safe=False)
         
 def get_inspection(request, guid):
     company = request.user.companies.filter(membership__is_general=True).first()
-    service = InspectionService(WEB_SERVISES['cp'])    
+    service = InspectionService(WEB_SERVISES[SERVICE_NAME])    
     service.get_inspection(request.user, company, guid)  
     return JsonResponse({'result': True})
 
@@ -61,7 +62,7 @@ class InspectionViewSet(viewsets.ViewSet):
             inspection = Inspection.objects.get(guid=pk)
         except Inspection.DoesNotExist:
             company = self.request.user.companies.filter(membership__is_general=True).first()
-            service = InspectionService(WEB_SERVISES['cp'])    
+            service = InspectionService(WEB_SERVISES[SERVICE_NAME])    
             inspection = service.get_inspection(self.request.user, company, pk)  
 
         serializer = InspectionSerializer(inspection)
