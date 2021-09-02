@@ -17,7 +17,7 @@ from inspection.services import InspectionService
 from inspection.models import Inspection
 from inspection.serializers import InspectionSerializer
 
-SERVICE_NAME = 'dc'
+SERVICE_NAME = 'cp_dc'
 
 class DashboardView(BaseService):
     TYPE = nutep.models.INSPECTION
