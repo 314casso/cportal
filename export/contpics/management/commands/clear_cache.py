@@ -3,5 +3,5 @@ from django.core.cache import cache
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        cache.clear()        
-        
+        cache.clear()
+        self.stdout.write('Cleared cache\n')
